@@ -10,6 +10,8 @@
         <input id="InputBox" type="text"/>
         <input id="SubmitButton" type="submit" value="Submit"/>
 
+        <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
+
         <div id="WordsWith3Letters"></div>
         <br/>
         <div id="WordsWith4Letters"></div>
@@ -25,11 +27,6 @@
     <style>
         .data-entry {
             display: inline-block;
-            width: 100%;
-        }
-        .data-entry div {
-            float: left;
-            margin-right: 5px;
         }
     </style>
 
@@ -213,12 +210,12 @@
             }
         }
 
-        function getFindableWordString(findableWordList) {
+        function getFindableWordString(findableWordList, showAllWords = false) {
             let result = "";
             let i = 0; 
             for (i = 0; i < findableWordList.length; i++) {
                 let currentWord = findableWordList[i]._word;
-                if (findableWordList[i]._found) {
+                if (showAllWords || findableWordList[i]._found) {
                     result = result.concat(currentWord);
                 }
                 else {
@@ -244,6 +241,7 @@
                 // TODO: Also need to check for special characters. I only want to allow letters here.
                 if (currentWord.length > 2 && currentWord.length < 8) {
                     originalWord = currentWord;
+                    document.getElementById("OriginalWord").innerHTML = originalWord;
                     currentGameSet = fullDictionary.createNewGameSet(currentWord);
                     // FOR DEBUGGING ONLY
                     console.log(currentGameSet);
@@ -268,11 +266,18 @@
             var wordsWith6LettersElem = document.getElementById("WordsWith6Letters");
             var wordsWith7LettersElem = document.getElementById("WordsWith7Letters");
 
-            wordsWith3LettersElem.innerHTML = getFindableWordString(currentGameSet._findable3Length);
-            wordsWith4LettersElem.innerHTML = getFindableWordString(currentGameSet._findable4Length);
-            wordsWith5LettersElem.innerHTML = getFindableWordString(currentGameSet._findable5Length);
-            wordsWith6LettersElem.innerHTML = getFindableWordString(currentGameSet._findable6Length);
-            wordsWith7LettersElem.innerHTML = getFindableWordString(currentGameSet._findable7Length);
+            let showAllWords = false;
+            if (currentWord.toUpperCase() === "I QUIT") {
+                showAllWords = true;
+            }
+
+            wordsWith3LettersElem.innerHTML = getFindableWordString(currentGameSet._findable3Length, showAllWords);
+            wordsWith4LettersElem.innerHTML = getFindableWordString(currentGameSet._findable4Length, showAllWords);
+            wordsWith5LettersElem.innerHTML = getFindableWordString(currentGameSet._findable5Length, showAllWords);
+            wordsWith6LettersElem.innerHTML = getFindableWordString(currentGameSet._findable6Length, showAllWords);
+            wordsWith7LettersElem.innerHTML = getFindableWordString(currentGameSet._findable7Length, showAllWords);
+
+            
 
             currentWordElement.value = "";
         }
