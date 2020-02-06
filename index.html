@@ -158,6 +158,10 @@
                 let findableWords = [];
                 let i = 0;
                 for (i = 0; i < wordList.length; i++) {
+                    // Don't include original word in the list
+                    if (wordList[i].toUpperCase() === originalWord.toUpperCase()) {
+                        continue;
+                    }
                     let findable = new FindableWord(wordList[i]);
                     findableWords.push(findable);
                 }
