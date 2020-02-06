@@ -115,8 +115,8 @@
                     return resultArray;
                 }
                 for (i = 0; i < inputWordArray.length; i++) {
-                    let inputWordChars = inputWord.split('');
-                    let currentArrayWordChars = inputWordArray[i].split('');
+                    let inputWordChars = inputWord.toUpperCase().split('');
+                    let currentArrayWordChars = inputWordArray[i].toUpperCase().split('');
                     let j = 0;
                     for (j = 0; j < inputWordChars.length; j++) {
                         let indexToRemove = currentArrayWordChars.indexOf(inputWordChars[j]);
