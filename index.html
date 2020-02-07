@@ -11,15 +11,15 @@
 
         <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
-        <div id="WordsWith3Letters"></div>
+        <div id="WordsWith3Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith4Letters"></div>
+        <div id="WordsWith4Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith5Letters"></div>
+        <div id="WordsWith5Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith6Letters"></div>
+        <div id="WordsWith6Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith7Letters"></div>
+        <div id="WordsWith7Letters" class="word-list"></div>
         <br/>
         <br/>
         <input id="ShowSolution" class="action-buttons" type="button" value="Show Full Solution (Quitter!)"/>
@@ -50,6 +50,10 @@
         }
         #InfoMessage {
             display: inline-block;
+        }
+        .word-list {
+            width: 250px;
+            word-wrap: normal;
         }
     </style>
 
