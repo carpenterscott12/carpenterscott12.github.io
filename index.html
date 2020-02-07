@@ -3,12 +3,12 @@
 
     </head>
     <body>
-        <div>Make Me a Sandwich</div>
+        <div>Make Me a Sandwich - The Game</div>
 
         <body>Enter a word to make me a sandwich:</body>
 
-        <input id="InputBox" type="text"/>
-        <input id="SubmitButton" type="submit" value="Submit"/>
+        <div id="input-area"><input id="InputBox" type="text"/><input id="SubmitButton" type="submit" value="Submit"/></div>
+        
 
         <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
@@ -22,19 +22,38 @@
         <br/>
         <div id="WordsWith7Letters"></div>
         <br/>
+        <br/>
+        <input id="ShowSolution" class="action-buttons" type="button" value="Show Full Solution (Quitter!)"/>
+        <input id="ResetButton" class="action-buttons" type="button" value="Reset Game (Lose all progress)"/>
 
     </bdivody>
     <style>
         .data-entry {
             display: inline-block;
         }
+        .action-buttons {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        #input-area {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        #InputBox {
+            margin-right: 5px;
+            padding: 10px;
+        }
+        #SubmitButton {
+            padding: 10px;
+        }
     </style>
 
     <script>
 
-        var fullDictionary;
-        var originalWord;
-        var currentGameSet;
+        var fullDictionary = null;
+        var originalWord = null;
+        var currentGameSet = null;
         var underscores = ["", "_", "__", "___", "____", "_____", "______", "_______"];
 
         class WordList 
@@ -260,26 +279,41 @@
                 }
             }
 
+            let showAllWords = false;
+            if (currentWord.toUpperCase() === "I QUIT") {
+                showAllWords = true;
+            }
+
+            updateWordDisplay(showAllWords);
+
+            
+
+            currentWordElement.value = "";
+        }
+
+        function updateWordDisplay(showAllWords) {
             var wordsWith3LettersElem = document.getElementById("WordsWith3Letters");
             var wordsWith4LettersElem = document.getElementById("WordsWith4Letters");
             var wordsWith5LettersElem = document.getElementById("WordsWith5Letters");
             var wordsWith6LettersElem = document.getElementById("WordsWith6Letters");
             var wordsWith7LettersElem = document.getElementById("WordsWith7Letters");
 
-            let showAllWords = false;
-            if (currentWord.toUpperCase() === "I QUIT") {
-                showAllWords = true;
-            }
-
             wordsWith3LettersElem.innerHTML = getFindableWordString(currentGameSet._findable3Length, showAllWords);
             wordsWith4LettersElem.innerHTML = getFindableWordString(currentGameSet._findable4Length, showAllWords);
             wordsWith5LettersElem.innerHTML = getFindableWordString(currentGameSet._findable5Length, showAllWords);
             wordsWith6LettersElem.innerHTML = getFindableWordString(currentGameSet._findable6Length, showAllWords);
             wordsWith7LettersElem.innerHTML = getFindableWordString(currentGameSet._findable7Length, showAllWords);
+        }
 
-            
-
-            currentWordElement.value = "";
+        function resetGame() {
+            originalWord = null;
+            currentGameSet = null;
+            document.getElementById("OriginalWord").innerHTML = "";
+            document.getElementById("WordsWith3Letters").innerHTML = "";
+            document.getElementById("WordsWith4Letters").innerHTML = "";
+            document.getElementById("WordsWith5Letters").innerHTML = "";
+            document.getElementById("WordsWith6Letters").innerHTML = "";
+            document.getElementById("WordsWith7Letters").innerHTML = "";
         }
 
         function startGame() {
@@ -297,6 +331,9 @@
                 submit();
             }
         });
+        document.getElementById("ResetButton").addEventListener('click', function() {resetGame()});
+        document.getElementById("ShowSolution").addEventListener('click', function() {updateWordDisplay(true)});
+        // ShowSolution
 
 
         var fullRawWordList = [
