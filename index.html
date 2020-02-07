@@ -7,7 +7,7 @@
 
         <body>Enter a word to make me a sandwich:</body>
 
-        <div id="input-area"><input id="InputBox" type="text"/><input id="SubmitButton" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
+        <div id="input-area"><input id="InputBox" type="text" autocomplete="off"/><input id="SubmitButton" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
         
 
         <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
@@ -273,6 +273,7 @@
                 if (currentWord.length > 2 && currentWord.length < 8) {
                     originalWord = currentWord;
                     document.getElementById("OriginalWord").innerHTML = originalWord;
+                    document.getElementById("InfoMessage").innerHTML = "";
                     currentGameSet = fullDictionary.createNewGameSet(currentWord);
                 }
                 else {
