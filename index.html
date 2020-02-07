@@ -3,11 +3,15 @@
 
     </head>
     <body>
-        <div>Make Me a Sandwich - The Game</div>
+        <div id="Title">Make Me a Sandwich - The Game</div>
+        <input id="CreateGameWithRandom" class="action-buttons rounded-button" type="button" value="Create a New Game with a Random Word"/>
+        <input id="ShowSolution" class="action-buttons rounded-button" type="button" value="Show Full Solution (Quitter!)"/>
+        <input id="ResetButton" class="action-buttons rounded-button" type="button" value="Reset Game (Lose all progress)"/>
+        
 
         <body>Enter a word to make me a sandwich:</body>
 
-        <div id="input-area"><input id="InputBox" type="text" autocomplete="off"/><input id="SubmitButton" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
+        <div id="input-area"><input id="InputBox" type="text" autocomplete="off"/><input id="SubmitButton" class="rounded-button" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
 
         <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
@@ -22,19 +26,32 @@
         <div id="WordsWith7Letters" class="word-list"></div>
         <br/>
         <br/>
-        <input id="ShowSolution" class="action-buttons" type="button" value="Show Full Solution (Quitter!)"/>
-        <input id="ResetButton" class="action-buttons" type="button" value="Reset Game (Lose all progress)"/>
-        <input id="CreateGameWithRandom" class="action-buttons" type="button" value="Create a New Game with a Random Word"/>
+        
 
-    </bdivody>
+    </body>
     <style>
+        body {
+            background-color:#121212;
+            color: #FFFFFF;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 30px;
+        }
         .data-entry {
             display: inline-block;
         }
         .action-buttons {
             display: block;
             margin-bottom: 10px;
-            padding: 10px;
+            padding: 15px;
+        }
+        .error-alert {
+            color: #CF6679;
+        }
+        .success-alert {
+            color: #03DAC6;
+        }
+        #Title {
+            margin-bottom: 10px;
         }
         #input-area {
             margin-top: 10px;
@@ -42,18 +59,44 @@
         }
         #InputBox {
             margin-right: 5px;
-            padding: 10px;
+            padding: 15px;
+            font-size: 20px;
+            border-radius: 4px;
+            border: 0px;
         }
         #SubmitButton {
             margin-right: 10px;
-            padding: 10px;
+            padding: 15px;
+            background-color: #BB86FC;
+            color: #121212;
         }
         #InfoMessage {
             display: inline-block;
         }
+        #ShowSolution {
+            background-color: #3700B3;
+            color: #FFFFFF;
+            display: none;
+        }
+        #ResetButton {
+            background-color: #CF6679;
+            color: #FFFFFF;
+            display: none;
+        }
+        #CreateGameWithRandom {
+            background-color: #03DAC6;
+            color: #121212;
+        }
         .word-list {
-            width: 250px;
+            width: 400px;
             word-wrap: normal;
+            font-size: 20px;
+        }
+        .rounded-button {
+            cursor: pointer;
+            border-radius: 4px;
+            border: 0px;
+            font-size: 20px;
         }
     </style>
 
@@ -295,7 +338,7 @@
 
         function submit() {
             if (currentGameSet && currentGameSet.currentGameCount === currentGameSet.endGameCount) {
-                document.getElementById("InfoMessage").innerHTML = "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)";
+                setAlert("success-alert", "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)");
                 return;
             }
 
@@ -307,7 +350,7 @@
                     createNewGame(currentWord);
                 }
                 else {
-                    document.getElementById("InfoMessage").innerHTML = "The input word must be between 3 and 7 characters long.";
+                    setAlert("error-alert", "The input word must be between 3 and 7 characters long.");
                 }
                 
             }
@@ -316,7 +359,7 @@
                     // Check against the currentGameSet
                     let success = currentGameSet.markWordFound(currentWord);
                     if (currentGameSet.currentGameCount === currentGameSet.endGameCount) {
-                        document.getElementById("InfoMessage").innerHTML = "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)";
+                        setAlert("success-alert", "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)");
                     }
                 }
             }
@@ -357,6 +400,7 @@
             document.getElementById("WordsWith6Letters").innerHTML = "";
             document.getElementById("WordsWith7Letters").innerHTML = "";
             document.getElementById("InfoMessage").innerHTML = "";
+            hideOngoingGameButtons();
         }
 
         function resetWithRandomWord() {
@@ -372,6 +416,7 @@
             document.getElementById("OriginalWord").innerHTML = newWord;
             document.getElementById("InfoMessage").innerHTML = "";
             currentGameSet = fullDictionary.createNewGameSet(newWord);
+            showOngoingGameButtons();
         }
 
         function getRandomIntInclusive(min, max) {
@@ -386,6 +431,22 @@
             var originalWord = "";
         }
 
+        function showOngoingGameButtons() {
+            document.getElementById("ShowSolution").style.display = "block";
+            document.getElementById("ResetButton").style.display = "block";
+        }
+
+        function hideOngoingGameButtons() {
+            document.getElementById("ShowSolution").style.display = "none";
+            document.getElementById("ResetButton").style.display = "none";
+        }
+
+        function setAlert(className, message) {
+            let infoMessage = document.getElementById("InfoMessage");
+            infoMessage.innerHTML = message;
+            infoMessage.className = className;
+        }
+
         // Setup:
         document.getElementById("SubmitButton").addEventListener('click', function() {submit()});
         document.getElementById('InputBox').addEventListener("keyup", function(event) {
@@ -395,9 +456,10 @@
                 submit();
             }
         });
+        document.getElementById("CreateGameWithRandom").addEventListener('click', function() {resetWithRandomWord()});
         document.getElementById("ResetButton").addEventListener('click', function() {resetGame()});
         document.getElementById("ShowSolution").addEventListener('click', function() {updateWordDisplay(true)});
-        document.getElementById("CreateGameWithRandom").addEventListener('click', function() {resetWithRandomWord()});
+        
 
 
         var fullRawWordList = [
