@@ -7,7 +7,7 @@
 
         <body>Enter a word to make me a sandwich:</body>
 
-        <div id="input-area"><input id="InputBox" type="text"/><input id="SubmitButton" type="submit" value="Submit"/></div>
+        <div id="input-area"><input id="InputBox" type="text"/><input id="SubmitButton" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
         
 
         <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
@@ -45,7 +45,11 @@
             padding: 10px;
         }
         #SubmitButton {
+            margin-right: 10px;
             padding: 10px;
+        }
+        #InfoMessage {
+            display: inline-block;
         }
     </style>
 
@@ -167,6 +171,8 @@
                 this._findable5Length = this.createFindableWordArray(words5Length);
                 this._findable6Length = this.createFindableWordArray(words6Length);
                 this._findable7Length = this.createFindableWordArray(words7Length);
+                this.endGameCount = this._findable3Length.length + this._findable4Length.length + this._findable5Length.length + this._findable6Length.length + this._findable7Length.length;
+                this.currentGameCount = 0;
             }
 
             createFindableWordArray(wordList) {
@@ -210,6 +216,7 @@
                 var index = findableWordList.findIndex(findable => findable._word.toUpperCase() === wordToFind.toUpperCase());
                 if (index > -1) {
                     findableWordList[index].markWordFound();
+                    this.currentGameCount++;
                     return true;
                 }
                 else {
@@ -254,6 +261,11 @@
         }
 
         function submit() {
+            if (currentGameSet && currentGameSet.currentGameCount === currentGameSet.endGameCount) {
+                document.getElementById("InfoMessage").innerHTML = "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)";
+                return;
+            }
+
             var currentWordElement = document.getElementById('InputBox');
             let currentWord = currentWordElement.value;
             if (!originalWord) {
@@ -262,11 +274,9 @@
                     originalWord = currentWord;
                     document.getElementById("OriginalWord").innerHTML = originalWord;
                     currentGameSet = fullDictionary.createNewGameSet(currentWord);
-                    // FOR DEBUGGING ONLY
-                    console.log(currentGameSet);
                 }
                 else {
-                    // Show message saying the word was the wrong length
+                    document.getElementById("InfoMessage").innerHTML = "The input word must be between 3 and 7 characters long.";
                 }
                 
             }
@@ -274,8 +284,9 @@
                 if (currentWord.length > 2 && currentWord.length < 8) {
                     // Check against the currentGameSet
                     let success = currentGameSet.markWordFound(currentWord);
-                    console.log(success);
-                    console.log(currentGameSet);
+                    if (currentGameSet.currentGameCount === currentGameSet.endGameCount) {
+                        document.getElementById("InfoMessage").innerHTML = "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)";
+                    }
                 }
             }
 
@@ -285,8 +296,6 @@
             }
 
             updateWordDisplay(showAllWords);
-
-            
 
             currentWordElement.value = "";
         }
@@ -308,12 +317,15 @@
         function resetGame() {
             originalWord = null;
             currentGameSet = null;
+
+            document.getElementById("InputBox").value = "";
             document.getElementById("OriginalWord").innerHTML = "";
             document.getElementById("WordsWith3Letters").innerHTML = "";
             document.getElementById("WordsWith4Letters").innerHTML = "";
             document.getElementById("WordsWith5Letters").innerHTML = "";
             document.getElementById("WordsWith6Letters").innerHTML = "";
             document.getElementById("WordsWith7Letters").innerHTML = "";
+            document.getElementById("InfoMessage").innerHTML = "";
         }
 
         function startGame() {
