@@ -8,7 +8,6 @@
         <body>Enter a word to make me a sandwich:</body>
 
         <div id="input-area"><input id="InputBox" type="text" autocomplete="off"/><input id="SubmitButton" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
-        
 
         <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
@@ -59,8 +58,11 @@
         var fullDictionary = null;
         var originalWord = null;
         var currentGameSet = null;
-        var underscores = ["", "_", "__", "___", "____", "_____", "______", "_______"];
+        // Each index corresponds to the number of underscores. E.g. underscores[6] returns a string with 6 underscores.
+        const underscores = ["", "_", "__", "___", "____", "_____", "______", "_______"];
 
+
+        // Classes:
         class WordList 
         {
             constructor(lengthOfWordsAllowed, initialWordList) 
@@ -261,6 +263,8 @@
             }
         }
 
+
+        // Functions:
         function getFindableWordString(findableWordList, showAllWords = false) {
             let result = "";
             let i = 0; 
@@ -296,10 +300,7 @@
             if (!originalWord) {
                 // TODO: Also need to check for special characters. I only want to allow letters here.
                 if (currentWord.length > 2 && currentWord.length < 8) {
-                    originalWord = currentWord;
-                    document.getElementById("OriginalWord").innerHTML = originalWord;
-                    document.getElementById("InfoMessage").innerHTML = "";
-                    currentGameSet = fullDictionary.createNewGameSet(currentWord);
+                    createNewGame(currentWord);
                 }
                 else {
                     document.getElementById("InfoMessage").innerHTML = "The input word must be between 3 and 7 characters long.";
@@ -357,12 +358,16 @@
         function resetWithRandomWord() {
             resetGame();
             let randomWord = fullDictionary.getRandomWord();
-            originalWord = randomWord;
-            document.getElementById("OriginalWord").innerHTML = originalWord;
-            document.getElementById("InfoMessage").innerHTML = "";
-            currentGameSet = fullDictionary.createNewGameSet(randomWord);
+            createNewGame(randomWord);
             updateWordDisplay(false);
             currentWordElement.value = "";
+        }
+
+        function createNewGame(newWord) {
+            originalWord = newWord;
+            document.getElementById("OriginalWord").innerHTML = newWord;
+            document.getElementById("InfoMessage").innerHTML = "";
+            currentGameSet = fullDictionary.createNewGameSet(newWord);
         }
 
         function getRandomIntInclusive(min, max) {
@@ -389,7 +394,6 @@
         document.getElementById("ResetButton").addEventListener('click', function() {resetGame()});
         document.getElementById("ShowSolution").addEventListener('click', function() {updateWordDisplay(true)});
         document.getElementById("CreateGameWithRandom").addEventListener('click', function() {resetWithRandomWord()});
-        // ShowSolution
 
 
         var fullRawWordList = [
