@@ -25,6 +25,7 @@
         <br/>
         <input id="ShowSolution" class="action-buttons" type="button" value="Show Full Solution (Quitter!)"/>
         <input id="ResetButton" class="action-buttons" type="button" value="Reset Game (Lose all progress)"/>
+        <input id="CreateGameWithRandom" class="action-buttons" type="button" value="Create a New Game with a Random Word"/>
 
     </bdivody>
     <style>
@@ -152,6 +153,30 @@
                     }
                 }
                 return resultArray;
+            }
+
+            getRandomWord() {
+                let randomInt = getRandomIntInclusive(3, 7);
+                let randomIndex = 0;
+                switch (randomInt) {
+                    case 3:
+                        randomIndex = getRandomIntInclusive(0, this._wordsWith3Letters._words.length - 1);
+                        return this._wordsWith3Letters._words[randomIndex];
+                    case 4:
+                        randomIndex = getRandomIntInclusive(0, this._wordsWith4Letters._words.length - 1);
+                        return this._wordsWith4Letters._words[randomIndex];
+                    case 5:
+                        randomIndex = getRandomIntInclusive(0, this._wordsWith5Letters._words.length - 1);
+                        return this._wordsWith5Letters._words[randomIndex];
+                    case 6:
+                        randomIndex = getRandomIntInclusive(0, this._wordsWith6Letters._words.length - 1);
+                        return this._wordsWith6Letters._words[randomIndex];
+                    case 7:
+                        randomIndex = getRandomIntInclusive(0, this._wordsWith7Letters._words.length - 1);
+                        return this._wordsWith7Letters._words[randomIndex];
+                    default:
+                        return false;
+                }
             }
 
             createNewGameSet(inputWord) {
@@ -329,6 +354,23 @@
             document.getElementById("InfoMessage").innerHTML = "";
         }
 
+        function resetWithRandomWord() {
+            resetGame();
+            let randomWord = fullDictionary.getRandomWord();
+            originalWord = randomWord;
+            document.getElementById("OriginalWord").innerHTML = originalWord;
+            document.getElementById("InfoMessage").innerHTML = "";
+            currentGameSet = fullDictionary.createNewGameSet(randomWord);
+            updateWordDisplay(false);
+            currentWordElement.value = "";
+        }
+
+        function getRandomIntInclusive(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
         function startGame() {
             fullDictionary = new FullDictionary(fullRawWordList);
             console.log(fullDictionary);
@@ -346,6 +388,7 @@
         });
         document.getElementById("ResetButton").addEventListener('click', function() {resetGame()});
         document.getElementById("ShowSolution").addEventListener('click', function() {updateWordDisplay(true)});
+        document.getElementById("CreateGameWithRandom").addEventListener('click', function() {resetWithRandomWord()});
         // ShowSolution
 
 
