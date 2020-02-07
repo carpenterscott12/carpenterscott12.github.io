@@ -13,7 +13,7 @@
 
         <div id="input-area"><input id="InputBox" type="text" autocomplete="off"/><input id="SubmitButton" class="rounded-button" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
 
-        <div >Original Word: <div id="OriginalWord" class="data-entry"></div></div>
+        <div id="OriginalWordContainer">Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
         <div id="WordsWith3Letters" class="word-list"></div>
         <br/>
@@ -69,6 +69,9 @@
             padding: 15px;
             background-color: #BB86FC;
             color: #121212;
+        }
+        #OriginalWordContainer {
+            margin-bottom: 10px;
         }
         #InfoMessage {
             display: inline-block;
