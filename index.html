@@ -15,14 +15,19 @@
 
         <div id="OriginalWordContainer">Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
+        <div id="WordsWith3LettersLabel">3 letter words: </div>
         <div id="WordsWith3Letters" class="word-list"></div>
         <br/>
+        <div id="WordsWith4LettersLabel">4 letter words: </div>
         <div id="WordsWith4Letters" class="word-list"></div>
         <br/>
+        <div id="WordsWith5LettersLabel">5 letter words: </div>
         <div id="WordsWith5Letters" class="word-list"></div>
         <br/>
+        <div id="WordsWith6LettersLabel">6 letter words: </div>
         <div id="WordsWith6Letters" class="word-list"></div>
         <br/>
+        <div id="WordsWith7LettersLabel">7 letter words: </div>
         <div id="WordsWith7Letters" class="word-list"></div>
         <br/>
         <br/>
@@ -389,12 +394,53 @@
             var wordsWith5LettersElem = document.getElementById("WordsWith5Letters");
             var wordsWith6LettersElem = document.getElementById("WordsWith6Letters");
             var wordsWith7LettersElem = document.getElementById("WordsWith7Letters");
+            var wordsWith3LettersLabelElem = document.getElementById("WordsWith3LettersLabel");
+            var wordsWith4LettersLabelElem = document.getElementById("WordsWith4LettersLabel");
+            var wordsWith5LettersLabelElem = document.getElementById("WordsWith5LettersLabel");
+            var wordsWith6LettersLabelElem = document.getElementById("WordsWith6LettersLabel");
+            var wordsWith7LettersLabelElem = document.getElementById("WordsWith7LettersLabel");
 
-            wordsWith3LettersElem.innerHTML = getFindableWordString(currentGameSet._findable3Length, showAllWords);
-            wordsWith4LettersElem.innerHTML = getFindableWordString(currentGameSet._findable4Length, showAllWords);
-            wordsWith5LettersElem.innerHTML = getFindableWordString(currentGameSet._findable5Length, showAllWords);
-            wordsWith6LettersElem.innerHTML = getFindableWordString(currentGameSet._findable6Length, showAllWords);
-            wordsWith7LettersElem.innerHTML = getFindableWordString(currentGameSet._findable7Length, showAllWords);
+            let innerHtml3Long = getFindableWordString(currentGameSet._findable3Length, showAllWords);
+            let innerHtml4Long = getFindableWordString(currentGameSet._findable4Length, showAllWords);
+            let innerHtml5Long = getFindableWordString(currentGameSet._findable5Length, showAllWords);
+            let innerHtml6Long = getFindableWordString(currentGameSet._findable6Length, showAllWords);
+            let innerHtml7Long = getFindableWordString(currentGameSet._findable7Length, showAllWords);
+
+            if (innerHtml3Long) {
+                wordsWith3LettersElem.innerHTML = innerHtml3Long;
+                wordsWith3LettersLabelElem.style.display = "block";
+            }
+            else {
+                wordsWith3LettersLabelElem.style.display = "none";
+            }
+            if (innerHtml4Long) {
+                wordsWith4LettersElem.innerHTML = innerHtml4Long;
+                wordsWith4LettersLabelElem.style.display = "block";
+            }
+            else {
+                wordsWith4LettersLabelElem.style.display = "none";
+            }
+            if (innerHtml5Long) {
+                wordsWith5LettersElem.innerHTML = innerHtml5Long;
+                wordsWith5LettersLabelElem.style.display = "block";
+            }
+            else {
+                wordsWith5LettersLabelElem.style.display = "none";
+            }
+            if (innerHtml6Long) {
+                wordsWith6LettersElem.innerHTML = innerHtml6Long;
+                wordsWith6LettersLabelElem.style.display = "block";
+            }
+            else {
+                wordsWith6LettersLabelElem.style.display = "none";
+            }
+            if (innerHtml7Long) {
+                wordsWith7LettersElem.innerHTML = innerHtml7Long;
+                wordsWith7LettersLabelElem.style.display = "block";
+            }
+            else {
+                wordsWith7LettersLabelElem.style.display = "none";
+            }
         }
 
         function resetGame() {
