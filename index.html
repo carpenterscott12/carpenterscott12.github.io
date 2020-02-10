@@ -292,9 +292,15 @@
             findableContainsWord(wordToFind, findableWordList) {
                 var index = findableWordList.findIndex(findable => findable._word.toUpperCase() === wordToFind.toUpperCase());
                 if (index > -1) {
-                    findableWordList[index].markWordFound();
-                    this.currentGameCount++;
-                    return true;
+                    // If the word has already been found, don't increment the currentGameCount here. That causes the success message to play too early when entering existing found words.
+                    if (findableWordList[index]._found == false) {
+                        findableWordList[index].markWordFound();
+                        this.currentGameCount++;
+                        return true;
+                    }
+                    else {
+                        false;
+                    }
                 }
                 else {
                     return false;
