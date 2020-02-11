@@ -9,7 +9,7 @@
         <input id="ResetButton" class="action-buttons rounded-button" type="button" value="Reset Game (Lose all progress)"/>
         
 
-        <body>Enter a word to make me a sandwich:</body>
+        <div id="EnterAWordToStart">Enter a word to make me a sandwich:</div>
 
         <div id="input-area"><input id="InputBox" type="text" autocomplete="off"/><input id="SubmitButton" class="rounded-button" type="submit" value="Submit"/><div id="InfoMessage"></div></div>
 
@@ -46,7 +46,7 @@
         }
         .action-buttons {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             padding: 15px;
         }
         .error-alert {
@@ -84,8 +84,12 @@
             background-color: #BB86FC;
             color: #121212;
         }
+        #EnterAWordToStart {
+            display: block;
+        }
         #OriginalWordContainer {
             margin-bottom: 10px;
+            display: none;
         }
         #InfoMessage {
             display: inline-block;
@@ -517,11 +521,14 @@
             document.getElementById("WordsWith6Letters").innerHTML = "";
             document.getElementById("WordsWith7Letters").innerHTML = "";
             document.getElementById("InfoMessage").innerHTML = "";
+            document.getElementById("OriginalWordContainer").style.display = "none";
             document.getElementById("WordsWith3LettersLabel").style.display = "none";
             document.getElementById("WordsWith4LettersLabel").style.display = "none";
             document.getElementById("WordsWith5LettersLabel").style.display = "none";
             document.getElementById("WordsWith6LettersLabel").style.display = "none";
             document.getElementById("WordsWith7LettersLabel").style.display = "none";
+            document.getElementById("EnterAWordToStart").style.display = "block";
+            
             hideOngoingGameButtons();
         }
 
@@ -536,6 +543,8 @@
         function createNewGame(newWord) {
             originalWord = newWord;
             document.getElementById("OriginalWord").innerHTML = newWord;
+            document.getElementById("OriginalWordContainer").style.display = "block";
+            document.getElementById("EnterAWordToStart").style.display = "none";
             document.getElementById("InfoMessage").innerHTML = "";
             currentGameSet = fullDictionary.createNewGameSet(newWord);
             showOngoingGameButtons();
