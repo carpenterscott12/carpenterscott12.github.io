@@ -15,19 +15,19 @@
 
         <div id="OriginalWordContainer">Original Word: <div id="OriginalWord" class="data-entry"></div></div>
 
-        <div id="WordsWith3LettersLabel">3 letter words: </div>
+        <div id="WordsWith3LettersLabel" class="word-length-label">3 letter words: </div>
         <div id="WordsWith3Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith4LettersLabel">4 letter words: </div>
+        <div id="WordsWith4LettersLabel" class="word-length-label">4 letter words: </div>
         <div id="WordsWith4Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith5LettersLabel">5 letter words: </div>
+        <div id="WordsWith5LettersLabel" class="word-length-label">5 letter words: </div>
         <div id="WordsWith5Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith6LettersLabel">6 letter words: </div>
+        <div id="WordsWith6LettersLabel" class="word-length-label">6 letter words: </div>
         <div id="WordsWith6Letters" class="word-list"></div>
         <br/>
-        <div id="WordsWith7LettersLabel">7 letter words: </div>
+        <div id="WordsWith7LettersLabel" class="word-length-label">7 letter words: </div>
         <div id="WordsWith7Letters" class="word-list"></div>
         <br/>
         <br/>
@@ -54,6 +54,12 @@
         }
         .success-alert {
             color: #03DAC6;
+        }
+        .warning-alert {
+            color: #FFDE03;
+        }
+        .word-length-label {
+            display: none;
         }
         #Title {
             margin-bottom: 10px;
@@ -113,6 +119,8 @@
         var fullDictionary = null;
         var originalWord = null;
         var currentGameSet = null;
+        var currentExistingWordIndex = 0;
+        var currentWordDoesNotExistIndex = 0;
         // Each index corresponds to the number of underscores. E.g. underscores[6] returns a string with 6 underscores.
         const underscores = ["", "_", "__", "___", "____", "_____", "______", "_______"];
 
@@ -301,14 +309,65 @@
                     if (findableWordList[index]._found == false) {
                         findableWordList[index].markWordFound();
                         this.currentGameCount++;
+                        clearAlert();
                         return true;
                     }
                     else {
+                        this.setExistingWordAlert();
                         false;
                     }
                 }
                 else {
+                    this.setWordDoesNotExistAlert();
                     return false;
+                }
+            }
+
+            setExistingWordAlert() {
+                switch (currentExistingWordIndex) {
+                    case 0:
+                        setAlert("warning-alert", "Dat's already on the sandwich!");
+                        break;
+                    case 1:
+                        setAlert("warning-alert", "That's there already, take it easy on the mustard!");
+                        break;
+                    case 2:
+                        setAlert("warning-alert", "It's already here, don't overdo it.");
+                        break;
+                    case 3:
+                        setAlert("warning-alert", "Already on the sandwich, find a new dog to do the old trick.");
+                        break;
+                    default:
+                        setAlert("warning-alert", "I got one of those already.");
+                        break;
+                }
+                currentExistingWordIndex++;
+                if (currentExistingWordIndex > 4) {
+                    currentExistingWordIndex = 0;
+                }
+            }
+
+            setWordDoesNotExistAlert() {
+                switch (currentWordDoesNotExistIndex) {
+                    case 0:
+                        setAlert("error-alert", "NASTY");
+                        break;
+                    case 1:
+                        setAlert("error-alert", "I never seen that on a sandwich.");
+                        break;
+                    case 2:
+                        setAlert("error-alert", "Have you made a sandwich before? Garbaggio!");
+                        break;
+                    case 3:
+                        setAlert("error-alert", "I'm glad I'm not paying you to do this.");
+                        break;
+                    default:
+                        setAlert("error-alert", "No! I don't want that! Get it together!");
+                        break;
+                }
+                currentWordDoesNotExistIndex++;
+                if (currentWordDoesNotExistIndex > 4) {
+                    currentWordDoesNotExistIndex = 0;
                 }
             }
         }
@@ -486,12 +545,6 @@
         }
 
         function startGame() {
-            document.getElementById("WordsWith3LettersLabel").style.display = "none";
-            document.getElementById("WordsWith4LettersLabel").style.display = "none";
-            document.getElementById("WordsWith5LettersLabel").style.display = "none";
-            document.getElementById("WordsWith6LettersLabel").style.display = "none";
-            document.getElementById("WordsWith7LettersLabel").style.display = "none";
-
             fullDictionary = new FullDictionary(fullRawWordList);
             console.log(fullDictionary);
             var originalWord = "";
@@ -511,6 +564,11 @@
             let infoMessage = document.getElementById("InfoMessage");
             infoMessage.innerHTML = message;
             infoMessage.className = className;
+        }
+
+        function clearAlert() {
+            let infoMessage = document.getElementById("InfoMessage");
+            infoMessage.innerHTML = "";
         }
 
         // Setup:
