@@ -58,6 +58,9 @@
         .warning-alert {
             color: #FFDE03;
         }
+        .info-alert {
+            color: #BB86FC;
+        }
         .word-length-label {
             display: none;
         }
@@ -536,6 +539,7 @@
             document.getElementById("InfoMessage").innerHTML = "";
             currentGameSet = fullDictionary.createNewGameSet(newWord);
             showOngoingGameButtons();
+            setAlert("info-alert", "Enter a word that can be made from the other letters. That's how you make a sandwich!");
         }
 
         function getRandomIntInclusive(min, max) {
