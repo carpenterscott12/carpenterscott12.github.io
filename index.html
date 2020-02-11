@@ -455,6 +455,11 @@
             document.getElementById("WordsWith6Letters").innerHTML = "";
             document.getElementById("WordsWith7Letters").innerHTML = "";
             document.getElementById("InfoMessage").innerHTML = "";
+            document.getElementById("WordsWith3LettersLabel").style.display = "none";
+            document.getElementById("WordsWith4LettersLabel").style.display = "none";
+            document.getElementById("WordsWith5LettersLabel").style.display = "none";
+            document.getElementById("WordsWith6LettersLabel").style.display = "none";
+            document.getElementById("WordsWith7LettersLabel").style.display = "none";
             hideOngoingGameButtons();
         }
 
@@ -481,6 +486,12 @@
         }
 
         function startGame() {
+            document.getElementById("WordsWith3LettersLabel").style.display = "none";
+            document.getElementById("WordsWith4LettersLabel").style.display = "none";
+            document.getElementById("WordsWith5LettersLabel").style.display = "none";
+            document.getElementById("WordsWith6LettersLabel").style.display = "none";
+            document.getElementById("WordsWith7LettersLabel").style.display = "none";
+
             fullDictionary = new FullDictionary(fullRawWordList);
             console.log(fullDictionary);
             var originalWord = "";
