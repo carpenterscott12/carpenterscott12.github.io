@@ -1,0 +1,84 @@
+body {
+    background-color:#121212;
+    color: #FFFFFF;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+}
+.data-entry {
+    display: inline-block;
+}
+.action-buttons {
+    display: block;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+.error-alert {
+    color: #CF6679;
+}
+.success-alert {
+    color: #03DAC6;
+}
+.warning-alert {
+    color: #FFDE03;
+}
+.info-alert {
+    color: #BB86FC;
+}
+.word-length-label {
+    display: none;
+}
+#Title {
+    margin-bottom: 10px;
+}
+#input-area {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+#InputBox {
+    margin-right: 5px;
+    padding: 15px;
+    font-size: 20px;
+    border-radius: 4px;
+    border: 0px;
+}
+#SubmitButton {
+    margin-right: 10px;
+    padding: 15px;
+    background-color: #BB86FC;
+    color: #121212;
+}
+#EnterAWordToStart {
+    display: block;
+}
+#OriginalWordContainer {
+    margin-bottom: 10px;
+    display: none;
+}
+#InfoMessage {
+    display: inline-block;
+}
+#ShowSolution {
+    background-color: #3700B3;
+    color: #FFFFFF;
+    display: none;
+}
+#ResetButton {
+    background-color: #CF6679;
+    color: #FFFFFF;
+    display: none;
+}
+#CreateGameWithRandom {
+    background-color: #03DAC6;
+    color: #121212;
+}
+.word-list {
+    width: 400px;
+    word-wrap: normal;
+    font-size: 20px;
+}
+.rounded-button {
+    cursor: pointer;
+    border-radius: 4px;
+    border: 0px;
+    font-size: 20px;
+}
