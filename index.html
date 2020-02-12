@@ -558,7 +558,16 @@
         }
 
         function startGame() {
-            fullDictionary = new FullDictionary(fullRawWordList);
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(this.responseText);
+                    fullDictionary = new FullDictionary(this.responseText.split("\\n"));
+                }
+            }
+            xhttp.open("GET", "wordlist.txt", true);
+            xhttp.send();
+            //fullDictionary = new FullDictionary(fullRawWordList);
             console.log(fullDictionary);
             var originalWord = "";
         }
