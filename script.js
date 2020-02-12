@@ -1,4 +1,4 @@
-import { fullRawWordList } from './wordList';
+import { fullRawWordList } from './rawWordList';
 
 var fullDictionary = null;
         var originalWord = null;
