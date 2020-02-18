@@ -32,6 +32,9 @@
         <br/>
         <br/>
 
+        <div id="Footer">
+            <div id="LetterButton0" class="letter-button">A</div>
+        </div>
     </body>
     <style>
         
@@ -44,6 +47,7 @@
         var currentGameSet = null;
         var currentExistingWordIndex = 0;
         var currentWordDoesNotExistIndex = 0;
+        var letterButtons = null;
         // Each index corresponds to the number of underscores. E.g. underscores[6] returns a string with 6 underscores.
         const underscores = ["", "_", "__", "___", "____", "_____", "______", "_______"];
 
@@ -426,10 +430,13 @@
             else {
                 wordsWith7LettersLabelElem.style.display = "none";
             }
+
+            document.getElementById("LetterButton0").innerHTML = letterButtons[0].toUpperCase();
         }
 
         function resetGame() {
             originalWord = null;
+            letterButtons = null;
             currentGameSet = null;
 
             document.getElementById("InputBox").value = "";
@@ -461,6 +468,7 @@
 
         function createNewGame(newWord) {
             originalWord = newWord;
+            letterButtons = originalWord.split('');
             document.getElementById("OriginalWord").innerHTML = newWord;
             document.getElementById("OriginalWordContainer").style.display = "block";
             document.getElementById("EnterAWordToStart").style.display = "none";
@@ -468,6 +476,10 @@
             currentGameSet = fullDictionary.createNewGameSet(newWord);
             showOngoingGameButtons();
             setAlert("info-alert", "Enter a word that can be made from the other letters. That's how you make a sandwich!");
+        }
+
+        function handleLetterButton(index) {
+            
         }
 
         function getRandomIntInclusive(min, max) {
@@ -482,11 +494,13 @@
         }
 
         function showOngoingGameButtons() {
+            document.getElementById("Title").style.display = "none";
             document.getElementById("ShowSolution").style.display = "block";
             document.getElementById("ResetButton").style.display = "block";
         }
 
         function hideOngoingGameButtons() {
+            document.getElementById("Title").style.display = "block";
             document.getElementById("ShowSolution").style.display = "none";
             document.getElementById("ResetButton").style.display = "none";
         }
@@ -514,6 +528,7 @@
         document.getElementById("CreateGameWithRandom").addEventListener('click', function() {resetWithRandomWord()});
         document.getElementById("ResetButton").addEventListener('click', function() {resetGame()});
         document.getElementById("ShowSolution").addEventListener('click', function() {updateWordDisplay(true)});
+        document.getElementById("LetterButton0").addEventListener('click', function() {handleLetterButton(0)});
         
 
 
