@@ -34,6 +34,14 @@
 
         <div id="Footer">
             <div id="LetterButton0" class="letter-button">A</div>
+            <div id="LetterButton1" class="letter-button">B</div>
+            <div id="LetterButton2" class="letter-button">C</div>
+            <div id="LetterButton3" class="letter-button">D</div>
+            <div id="LetterButton4" class="letter-button">E</div>
+            <div id="LetterButton5" class="letter-button">F</div>
+            <div id="LetterButton6" class="letter-button">G</div>
+            <div id="ClearInputButton" class="letter-button">%</div>
+            <div id="SubmitFooterButton" class="letter-button">+</div>
         </div>
     </body>
     <style>
@@ -48,6 +56,7 @@
         var currentExistingWordIndex = 0;
         var currentWordDoesNotExistIndex = 0;
         var letterButtons = null;
+        var currentInput = "";
         // Each index corresponds to the number of underscores. E.g. underscores[6] returns a string with 6 underscores.
         const underscores = ["", "_", "__", "___", "____", "_____", "______", "_______"];
 
@@ -335,14 +344,21 @@
             return result;
         }
 
-        function submit() {
+        function submit(inputWord) {
             if (currentGameSet && currentGameSet.currentGameCount === currentGameSet.endGameCount) {
                 setAlert("success-alert", "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)");
                 return;
             }
 
             var currentWordElement = document.getElementById('InputBox');
-            let currentWord = currentWordElement.value;
+            let currentWord;
+            if (inputWord) {
+                currentWord = inputWord;
+            }
+            else {
+                currentWord = currentWordElement.value;
+            }
+            
             if (!originalWord) {
                 // TODO: Also need to check for special characters. I only want to allow letters here.
                 if (currentWord.length > 2 && currentWord.length < 8) {
@@ -360,6 +376,10 @@
                     if (currentGameSet.currentGameCount === currentGameSet.endGameCount) {
                         setAlert("success-alert", "Congratulations! You done it! You a winner now! (Press the Reset Game button to play again)");
                     }
+                    else {
+                        // We only need to update the display if the success alert is not being shown.
+                        clearInput();
+                    }
                 }
             }
 
@@ -375,6 +395,7 @@
             
 
             currentWordElement.value = "";
+            currentInput = '';
         }
 
         function updateWordDisplay(showAllWords) {
@@ -431,13 +452,29 @@
                 wordsWith7LettersLabelElem.style.display = "none";
             }
 
-            document.getElementById("LetterButton0").innerHTML = letterButtons[0].toUpperCase();
+            assignLetterButtons();
+        }
+
+        function assignLetterButtons() {
+            let i = 0;
+            for (i = 0; i < letterButtons.length; i++) {
+                document.getElementById("LetterButton" + i).innerHTML = letterButtons[i].toUpperCase();
+                document.getElementById("LetterButton" + i).style.display = "inline-block";
+            }
+            if (letterButtons.length < 7) {
+                let remaining = letterButtons.length;
+                let j = remaining;
+                for (j = remaining; j < 7; j++) {
+                    document.getElementById("LetterButton" + j).style.display = "none";
+                }
+            }
         }
 
         function resetGame() {
             originalWord = null;
             letterButtons = null;
             currentGameSet = null;
+            currentInput = "";
 
             document.getElementById("InputBox").value = "";
             document.getElementById("OriginalWord").innerHTML = "";
@@ -468,6 +505,7 @@
 
         function createNewGame(newWord) {
             originalWord = newWord;
+            currentInput = "";
             letterButtons = originalWord.split('');
             document.getElementById("OriginalWord").innerHTML = newWord;
             document.getElementById("OriginalWordContainer").style.display = "block";
@@ -479,7 +517,13 @@
         }
 
         function handleLetterButton(index) {
-            
+            currentInput += letterButtons[index];
+            setAlert("text-alert", currentInput);
+        }
+
+        function clearInput() {
+            currentInput = '';
+            setAlert("text-alert", currentInput);
         }
 
         function getRandomIntInclusive(min, max) {
@@ -497,12 +541,23 @@
             document.getElementById("Title").style.display = "none";
             document.getElementById("ShowSolution").style.display = "block";
             document.getElementById("ResetButton").style.display = "block";
+            document.getElementById("ClearInputButton").style.display = "inline-block";
+            document.getElementById("SubmitFooterButton").style.display = "inline-block";
         }
 
         function hideOngoingGameButtons() {
             document.getElementById("Title").style.display = "block";
             document.getElementById("ShowSolution").style.display = "none";
             document.getElementById("ResetButton").style.display = "none";
+            document.getElementById("LetterButton0").style.display = "none";
+            document.getElementById("LetterButton1").style.display = "none";
+            document.getElementById("LetterButton2").style.display = "none";
+            document.getElementById("LetterButton3").style.display = "none";
+            document.getElementById("LetterButton4").style.display = "none";
+            document.getElementById("LetterButton5").style.display = "none";
+            document.getElementById("LetterButton6").style.display = "none";
+            document.getElementById("ClearInputButton").style.display = "none";
+            document.getElementById("SubmitFooterButton").style.display = "none";
         }
 
         function setAlert(className, message) {
@@ -517,18 +572,26 @@
         }
 
         // Setup:
-        document.getElementById("SubmitButton").addEventListener('click', function() {submit()});
+        document.getElementById("SubmitButton").addEventListener('click', function() {submit(null)});
         document.getElementById('InputBox').addEventListener("keyup", function(event) {
             event.preventDefault();
             if (event.keyCode === 13) {
                 // Equivalent to clicking on the SubmitButton element
-                submit();
+                submit(null);
             }
         });
         document.getElementById("CreateGameWithRandom").addEventListener('click', function() {resetWithRandomWord()});
         document.getElementById("ResetButton").addEventListener('click', function() {resetGame()});
         document.getElementById("ShowSolution").addEventListener('click', function() {updateWordDisplay(true)});
         document.getElementById("LetterButton0").addEventListener('click', function() {handleLetterButton(0)});
+        document.getElementById("LetterButton1").addEventListener('click', function() {handleLetterButton(1)});
+        document.getElementById("LetterButton2").addEventListener('click', function() {handleLetterButton(2)});
+        document.getElementById("LetterButton3").addEventListener('click', function() {handleLetterButton(3)});
+        document.getElementById("LetterButton4").addEventListener('click', function() {handleLetterButton(4)});
+        document.getElementById("LetterButton5").addEventListener('click', function() {handleLetterButton(5)});
+        document.getElementById("LetterButton6").addEventListener('click', function() {handleLetterButton(6)});
+        document.getElementById("ClearInputButton").addEventListener('click', function() {clearInput()});
+        document.getElementById("SubmitFooterButton").addEventListener('click', function() {submit(currentInput)})
         
 
 
