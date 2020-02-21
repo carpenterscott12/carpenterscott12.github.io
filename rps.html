@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
+
+<body>
+    <div id="OpponentName">Opponent</div>
+    <div id="OpponentPick">-</div>
+    <div id="YourName">Player</div>
+    <div id="YourPick">-</div>
+    <input id="RockButton" type="button" value="Rock" />
+    <input id="PaperButton" type="button" value="Paper" />
+    <input id="ScissorsButton" type="button" value="Scissors" />
+    <div id="WinnerMessage">-</div>
+</body>
+<style>
+
+</style>
+
+<script>
+
+    let history = [];
+    let currentOpponentPick = null;
+    let currentPlayerPick = null;
+    let opponent = null;
+    let player = null;
+    let YourNameDiv = null;
+    let YourPickDiv = null;
+    let OpponentNameDiv = null;
+    let OpponentPickDiv = null;
+    let WinnerMessageDiv = null;
+    // Rock is 0, Paper is 1, Scissors is 2
+    const rockPaperScissors = ["rock", "paper", "scissors"];
+
+    class HtmlDiv {
+        constructor(divId, defaultInnerHtml) {
+            this._divId = divId;
+            this.element = document.getElementById(divId);
+            this.element.innerHTML = defaultInnerHtml;
+        }
+
+        hide() {
+            this.element.style.display = "none";
+        }
+
+        showBlock() {
+            this.element.style.display = "block";
+        }
+
+        showInlineBlock() {
+            this.element.style.display = "inline-block";
+        }
+
+        setInnerHtml(input) {
+            this.element.innerHTML = input;
+        }
+    }
+
+    class Opponent {
+        constructor(name, strategyIndex) {
+            this._name = name;
+            this._strategyIndex = strategyIndex;
+            this._previousMoveSeen = null;
+            this._myPreviousMove = null;
+        }
+
+        getNextMove() {
+            if (this._previousMoveSeen !== null) {
+                let win = this.wasMyLastResultAWin();
+                switch (this._strategyIndex) {
+                    case 0:
+                        // Always pick what would have beaten the opponent's last throw.
+                        this._myPreviousMove = getWhatBeatsThis(this._previousMoveSeen);
+                        return this._myPreviousMove;
+                    case 1: 
+                        // Always pick what would have lost to the opponent's last throw.
+                        this._myPreviousMove = getWhatThisBeats(this._previousMoveSeen);
+                        return this._myPreviousMove;
+                    case 2: 
+                        // Copy the opponent's last throw.
+                        this._myPreviousMove = this._previousMoveSeen;
+                        return this._myPreviousMove;
+                    case 3: 
+                        // Play in order, Rock, Paper, Scissors. Probably start with a random first throw, but then go in sequence.
+                        this._myPreviousMove = getNextInSequence(this._myPreviousMove);
+                        return this._myPreviousMove;
+                    case 4: 
+                        // If you win, play what the opponent just played. If you lose or tie, play what would have beaten the opponent's last throw. 
+                        if (win) {
+                            this._myPreviousMove = this._previousMoveSeen;
+                        }
+                        else {
+                            this._myPreviousMove = getWhatBeatsThis(this._previousMoveSeen);
+                        }
+                        return this._myPreviousMove;
+                    case 5: 
+                        // If you win, pick the same throw you just made. If you lose or tie, pick what your opponent threw.
+                        if (win) {
+                            this._myPreviousMove = this._myPreviousMove;
+                        }
+                        else {
+                            this._myPreviousMove = this._previousMoveSeen;
+                        }
+                        return this._myPreviousMove;
+                    case 6:
+                        // If you win, pick the next throw in rock, paper, scissors sequence. If you lose or tie, go backwards in sequence. 
+                        if (win) {
+                            this._myPreviousMove = getNextInSequence(this._myPreviousMove);
+                        }
+                        else {
+                            this._myPreviousMove = getPreviousInSequence(this._myPreviousMove);
+                        }
+                        return this._myPreviousMove;
+                    default:
+                        console.log("Strategy index was out of bounds.");
+                        return null;
+                }
+
+            }
+            else {
+                let random = getRandomIntInclusive(0, 2);
+                this._myPreviousMove = random;
+                return this._myPreviousMove;
+            }
+        }
+
+        setPreviousMoveSeen(previousMoveSeen) {
+            this._previousMoveSeen = previousMoveSeen;
+        }
+
+        wasMyLastResultAWin() {
+            if (this._myPreviousMove !== null && this._previousMoveSeen !== null) {
+                if (getWhatThisBeats(this._myPreviousMove) === this._myPreviousMove) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                console.log("My previous move and the previous move seen both must be populated.");
+            }
+            
+        }
+    }
+
+    class Player {
+        constructor(name) {
+            this._name = name;
+        }
+    }
+
+    function getWhatBeatsThis(symbol) {
+        switch (symbol) {
+            case 0:
+                return 1;
+            case 1:
+                return 2;
+            case 2:
+                return 0;
+        }
+    }
+
+    function getWhatThisBeats(symbol) {
+        switch (symbol) {
+            case 0:
+                return 2;
+            case 1:
+                return 0;
+            case 2:
+                return 1;
+        }
+    }
+
+    function getNextInSequence(index) {
+        if (index === 2) {
+            return 0;
+        }
+        else {
+            return index + 1;
+        }
+    }
+
+    function getPreviousInSequence(index) {
+        if (index === 0) {
+            return 2;
+        }
+        else {
+            return index - 1;
+        }
+    }
+
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function playerInput(pick) {
+        currentPlayerPick = pick;
+        currentOpponentPick = opponent.getNextMove();
+        opponent.setPreviousMoveSeen(currentPlayerPick);
+        OpponentPickDiv.setInnerHtml(rockPaperScissors[opponent._myPreviousMove]);
+        YourPickDiv.setInnerHtml(rockPaperScissors[currentPlayerPick]);
+        
+        if (currentPlayerPick === currentOpponentPick) {
+            WinnerMessageDiv.setInnerHtml("It was a tie");
+        }
+        else {
+            if (getWhatThisBeats(currentPlayerPick) === currentOpponentPick) {
+                WinnerMessageDiv.setInnerHtml("Player won");
+            }
+            else {
+                WinnerMessageDiv.setInnerHtml("Opponent won");
+            }
+        }
+        
+    }
+
+    function startGame() {
+        YourNameDiv = new HtmlDiv("YourName", "Player");
+        YourPickDiv = new HtmlDiv("YourPick", "-");
+        OpponentNameDiv = new HtmlDiv("OpponentName", "Opponent");
+        OpponentPickDiv = new HtmlDiv("OpponentPick", "-");
+        WinnerMessageDiv = new HtmlDiv("WinnerMessage", "-");
+
+        let random = getRandomIntInclusive(0, 6);
+        opponent = new Opponent("OpponentName", random);
+        console.log("Strategy index is: " + random);
+    }
+
+    function resetGame() {
+        YourNameDiv = new HtmlDiv("YourName", "Player");
+        YourPickDiv = new HtmlDiv("YourPick", "-");
+        OpponentNameDiv = new HtmlDiv("OpponentName", "Opponent");
+        OpponentPickDiv = new HtmlDiv("OpponentPick", "-");
+        WinnerMessageDiv = new HtmlDiv("WinnerMessage", "-");
+        history = [];
+        currentOpponentPick = null;
+        currentPlayerPick = null;
+    }
+
+    document.getElementById("RockButton").addEventListener('click', function () { playerInput(0) });
+    document.getElementById("PaperButton").addEventListener('click', function () { playerInput(1) });
+    document.getElementById("ScissorsButton").addEventListener('click', function () { playerInput(2) });
+
+
+    // Main game:
+    startGame();
+
+
+</script>
+
+</html>
