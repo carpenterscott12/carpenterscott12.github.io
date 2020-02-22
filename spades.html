@@ -2,9 +2,17 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="spades.css" />
 </head>
 
 <body>
+
+<div id="GameContainer">
+    <div id="Player1Cards" class="card-list"></div>
+    <div id="Player2Cards" class="card-list"></div>
+    <div id="Player3Cards" class="card-list"></div>
+    <div id="Player4Cards" class="card-list"></div>
+</div>
 
 </body>
 <style>
@@ -13,9 +21,206 @@
 
 <script>
 
+    // Globals
+    let deck = null;
+    let player1 = null;
+    let player2 = null;
+    let player3 = null;
+    let player4 = null;
+    let Player1CardsDiv = null;
+    let Player2CardsDiv = null;
+    let Player3CardsDiv = null;
+    let Player4CardsDiv = null;
+
+    // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
+    const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+    const suitStrings = ["♠", "♥", "♦", "♣"];
+
+    // Enums
+    const Suit = {
+        Spade: 0,
+        Heart: 1,
+        Diamond: 2,
+        Club: 3
+    }
+
+    // Classes
+    class HtmlDiv {
+        constructor(divId, defaultInnerHtml) {
+            this._divId = divId;
+            this.element = document.getElementById(divId);
+            this.element.innerHTML = defaultInnerHtml;
+        }
+
+        hide() {
+            this.element.style.display = "none";
+        }
+
+        showBlock() {
+            this.element.style.display = "block";
+        }
+
+        showInlineBlock() {
+            this.element.style.display = "inline-block";
+        }
+
+        setInnerHtml(input) {
+            this.element.innerHTML = input;
+        }
+    }
+
+    class Card {
+        constructor(rank, suit) {
+            this._rank = rank;
+            this._suit = suit;
+        }
+    }
+
+    class Deck {
+        constructor() {
+            this._cards = [];
+            this.addAllRanksForSuit(Suit.Spade);
+            this.addAllRanksForSuit(Suit.Heart);
+            this.addAllRanksForSuit(Suit.Diamond);
+            this.addAllRanksForSuit(Suit.Club);
+            this.shuffle();
+        }
+
+        addAllRanksForSuit(suit) {
+            let i = 0;
+            for (i = 0; i < 13; i++) {
+                let newCard = new Card(i + 2, suit);
+                this._cards.push(newCard);
+            }
+        }
+
+        shuffle() {
+            for (let i = this._cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this._cards[i], this._cards[j]] = [this._cards[j], this._cards[i]];
+            }
+        }
+
+        draw() {
+            if (this._cards.length > 0) {
+                return this._cards.shift();
+            }
+            else {
+                console.log("Deck was empty when trying to draw.");
+                return null;
+            }
+        }
+    }
+
+    class Player {
+        constructor(name) {
+            this._name = name;
+            this._spadesInHand = [];
+            this._heartsInHand = [];
+            this._diamondsInHand = [];
+            this._clubsInHand = [];
+        }
+
+        addToHand(card) {
+            switch (card._suit) {
+                case Suit.Spade:
+                    this._spadesInHand.push(card);
+                    break;
+                case Suit.Heart:
+                    this._heartsInHand.push(card);
+                    break;
+                case Suit.Diamond:
+                    this._diamondsInHand.push(card);
+                    break;
+                case Suit.Club:
+                    this._clubsInHand.push(card);
+                    break;
+                default:
+                    console.log("The suit was not valid.");
+            }
+        }
+
+        drawFullHand() {
+            if (deck !== null && deck._cards.length >= 13) {
+                let i = 0;
+                for (i = 0; i < 13; i++) {
+                    this.addToHand(deck.draw());
+                }
+            }
+            else {
+                console.log("The deck contained less than 13 cards when trying to deal a full hand.");
+            }
+        }
+
+        getHandList() {
+            let result = "";
+
+            this.sortByRank(this._spadesInHand);
+            this.sortByRank(this._heartsInHand);
+            this.sortByRank(this._diamondsInHand);
+            this.sortByRank(this._clubsInHand);
+            
+            
+            result += this.getListString(this._heartsInHand);
+            result += " ";
+            result += this.getListString(this._clubsInHand);
+            result += " ";
+            result += this.getListString(this._diamondsInHand);
+            result += " ";
+            result += this.getListString(this._spadesInHand);
+            
+
+            return result;
+        }
+
+        sortByRank(suitList) {
+            suitList.sort((a, b) => (a._rank > b._rank) ? 1 : -1);
+        }
+
+        getListString(suitList) {
+            let result = "";
+            let i = 0;
+            for (i = 0; i < suitList.length; i++) {
+                result += rankStrings[suitList[i]._rank] + suitStrings[suitList[i]._suit];
+                if (i != suitList.length - 1) {
+                    result += " ";
+                }
+                
+            }
+            return result;
+        }
+    }
+
+    // Functions
 
     function startGame() {
+        // The Deck constructor should shuffle the cards, so no need to do it again here.
+        deck = new Deck();
+        player1 = new Player("Player1");
+        player2 = new Player("COM2");
+        player3 = new Player("COM3");
+        player4 = new Player("COM4");
+        player1.drawFullHand();
+        player2.drawFullHand();
+        player3.drawFullHand();
+        player4.drawFullHand();
+        Player1CardsDiv = new HtmlDiv("Player1Cards", player1.getHandList());
+        Player2CardsDiv = new HtmlDiv("Player2Cards", player2.getHandList());
+        Player3CardsDiv = new HtmlDiv("Player3Cards", player3.getHandList());
+        Player4CardsDiv = new HtmlDiv("Player4Cards", player4.getHandList());
+    }
 
+    function dealNewHand() {
+        deck = new Deck();
+        player1.drawFullHand();
+        player2.drawFullHand();
+        player3.drawFullHand();
+        player4.drawFullHand();
+        Player1CardsDiv = new HtmlDiv("Player1Cards", player1.getHandList());
+        Player2CardsDiv = new HtmlDiv("Player2Cards", player2.getHandList());
+        Player3CardsDiv = new HtmlDiv("Player3Cards", player3.getHandList());
+        Player4CardsDiv = new HtmlDiv("Player4Cards", player4.getHandList());
     }
 
     function resetGame() {
