@@ -1,5 +1,12 @@
-.card-list {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 20px;
+.player-card {
+    cursor: pointer;
+    width: 40px;
+    height: 60px;
+}
+
+.play-area-card {
+    width: 40px;
+    height: 60px;
+    background-color: #999999;
+    margin-bottom: 10px;
 }

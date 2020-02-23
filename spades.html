@@ -8,10 +8,27 @@
 <body>
 
 <div id="GameContainer">
-    <div id="Player1Cards" class="card-list"></div>
-    <div id="Player2Cards" class="card-list"></div>
-    <div id="Player3Cards" class="card-list"></div>
-    <div id="Player4Cards" class="card-list"></div>
+    <div id="PlayArea">
+        <div id="Player4Card" class="play-area-card"></div>
+        <div id="Player3Card" class="play-area-card"></div>
+        <div id="Player2Card" class="play-area-card"></div>
+        <div id="Player1Card" class="play-area-card"></div>
+    </div>
+    <div id="PlayerCardsContainer">
+        <input id="playerCard0" class="player-card" type="button"/>
+        <input id="playerCard1" class="player-card" type="button"/>
+        <input id="playerCard2" class="player-card" type="button"/>
+        <input id="playerCard3" class="player-card" type="button"/>
+        <input id="playerCard4" class="player-card" type="button"/>
+        <input id="playerCard5" class="player-card" type="button"/>
+        <input id="playerCard6" class="player-card" type="button"/>
+        <input id="playerCard7" class="player-card" type="button"/>
+        <input id="playerCard8" class="player-card" type="button"/>
+        <input id="playerCard9" class="player-card" type="button"/>
+        <input id="playerCard10" class="player-card" type="button"/>
+        <input id="playerCard11" class="player-card" type="button"/>
+        <input id="playerCard12" class="player-card" type="button"/>
+    </div>
 </div>
 
 </body>
@@ -27,10 +44,12 @@
     let player2 = null;
     let player3 = null;
     let player4 = null;
-    let Player1CardsDiv = null;
-    let Player2CardsDiv = null;
-    let Player3CardsDiv = null;
-    let Player4CardsDiv = null;
+    let Player1CardDiv = null;
+    let Player2CardDiv = null;
+    let Player3CardDiv = null;
+    let Player4CardDiv = null;
+
+    let Player1CardInputs = [];
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -49,24 +68,56 @@
     class HtmlDiv {
         constructor(divId, defaultInnerHtml) {
             this._divId = divId;
-            this.element = document.getElementById(divId);
-            this.element.innerHTML = defaultInnerHtml;
+            this._element = document.getElementById(divId);
+            this._element.innerHTML = defaultInnerHtml;
         }
 
         hide() {
-            this.element.style.display = "none";
+            this._element.style.display = "none";
         }
 
         showBlock() {
-            this.element.style.display = "block";
+            this._element.style.display = "block";
         }
 
         showInlineBlock() {
-            this.element.style.display = "inline-block";
+            this._element.style.display = "inline-block";
         }
 
         setInnerHtml(input) {
-            this.element.innerHTML = input;
+            this._element.innerHTML = input;
+        }
+    }
+
+    class HtmlInput {
+        constructor(inputId, val) {
+            this._inputId = inputId;
+            this._element = document.getElementById(inputId);
+            this._element.value = val;
+        }
+
+        hide() {
+            this._element.style.display = "none";
+        }
+
+        showBlock() {
+            this._element.style.display = "block";
+        }
+
+        showInlineBlock() {
+            this._element.style.display = "inline-block";
+        }
+
+        setValue(val) {
+            this._element.value = val;
+        }
+
+        setColorRed() {
+            this._element.style.color = "red";
+        }
+
+        setColorBlack() {
+            this._element.style.color = "black";
         }
     }
 
@@ -74,6 +125,11 @@
         constructor(rank, suit) {
             this._rank = rank;
             this._suit = suit;
+            this._discarded = false;
+        }
+
+        discard() {
+            this._discarded = true;
         }
     }
 
@@ -147,31 +203,18 @@
                 for (i = 0; i < 13; i++) {
                     this.addToHand(deck.draw());
                 }
+                this.sortByRank(this._spadesInHand);
+                this.sortByRank(this._heartsInHand);
+                this.sortByRank(this._diamondsInHand);
+                this.sortByRank(this._clubsInHand);
             }
             else {
                 console.log("The deck contained less than 13 cards when trying to deal a full hand.");
             }
         }
 
-        getHandList() {
-            let result = "";
-
-            this.sortByRank(this._spadesInHand);
-            this.sortByRank(this._heartsInHand);
-            this.sortByRank(this._diamondsInHand);
-            this.sortByRank(this._clubsInHand);
-            
-            
-            result += this.getListString(this._heartsInHand);
-            result += " ";
-            result += this.getListString(this._clubsInHand);
-            result += " ";
-            result += this.getListString(this._diamondsInHand);
-            result += " ";
-            result += this.getListString(this._spadesInHand);
-            
-
-            return result;
+        getHandArray() {
+            return this._heartsInHand.concat(this._clubsInHand.concat(this._diamondsInHand.concat(this._spadesInHand)));
         }
 
         sortByRank(suitList) {
@@ -193,7 +236,6 @@
     }
 
     // Functions
-
     function startGame() {
         // The Deck constructor should shuffle the cards, so no need to do it again here.
         deck = new Deck();
@@ -205,10 +247,27 @@
         player2.drawFullHand();
         player3.drawFullHand();
         player4.drawFullHand();
-        Player1CardsDiv = new HtmlDiv("Player1Cards", player1.getHandList());
-        Player2CardsDiv = new HtmlDiv("Player2Cards", player2.getHandList());
-        Player3CardsDiv = new HtmlDiv("Player3Cards", player3.getHandList());
-        Player4CardsDiv = new HtmlDiv("Player4Cards", player4.getHandList());
+
+        let player1HandArray = player1.getHandArray();
+
+        let i = 0;
+        for (i = 0; i < player1HandArray.length; i++) {
+            let currentCard = player1HandArray[i];
+            let htmlInput = new HtmlInput("playerCard" + i, rankStrings[currentCard._rank] + suitStrings[currentCard._suit]);
+            if (currentCard._suit === Suit.Diamond || currentCard._suit === Suit.Heart) {
+                htmlInput.setColorRed();
+            }
+            if (currentCard._suit === Suit.Club || currentCard._suit === Suit.Spade) {
+                htmlInput.setColorBlack();
+            }
+            Player1CardInputs.push(htmlInput);
+        }
+
+        Player1CardDiv = new HtmlDiv("Player1Card", "");
+        Player2CardDiv = new HtmlDiv("Player2Card", "");
+        Player3CardDiv = new HtmlDiv("Player3Card", "");
+        Player4CardDiv = new HtmlDiv("Player4Card", "");
+
     }
 
     function dealNewHand() {
@@ -217,15 +276,32 @@
         player2.drawFullHand();
         player3.drawFullHand();
         player4.drawFullHand();
-        Player1CardsDiv = new HtmlDiv("Player1Cards", player1.getHandList());
-        Player2CardsDiv = new HtmlDiv("Player2Cards", player2.getHandList());
-        Player3CardsDiv = new HtmlDiv("Player3Cards", player3.getHandList());
-        Player4CardsDiv = new HtmlDiv("Player4Cards", player4.getHandList());
+    }
+
+    function playCard(cardId) {
+        if (Player1CardInputs !== null && Player1CardInputs.length > cardId) {
+            Player1CardInputs[cardId].hide();
+        }
+        Player1CardDiv.setInnerHtml(Player1CardInputs[cardId]._element.value)
     }
 
     function resetGame() {
 
     }
+
+    document.getElementById("playerCard0").addEventListener('click', function () {playCard(0)});
+    document.getElementById("playerCard1").addEventListener('click', function () {playCard(1)});
+    document.getElementById("playerCard2").addEventListener('click', function () {playCard(2)});
+    document.getElementById("playerCard3").addEventListener('click', function () {playCard(3)});
+    document.getElementById("playerCard4").addEventListener('click', function () {playCard(4)});
+    document.getElementById("playerCard5").addEventListener('click', function () {playCard(5)});
+    document.getElementById("playerCard6").addEventListener('click', function () {playCard(6)});
+    document.getElementById("playerCard7").addEventListener('click', function () {playCard(7)});
+    document.getElementById("playerCard8").addEventListener('click', function () {playCard(8)});
+    document.getElementById("playerCard9").addEventListener('click', function () {playCard(9)});
+    document.getElementById("playerCard10").addEventListener('click', function () {playCard(10)});
+    document.getElementById("playerCard11").addEventListener('click', function () {playCard(11)});
+    document.getElementById("playerCard12").addEventListener('click', function () {playCard(12)});
 
     // Main game:
     startGame();
