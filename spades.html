@@ -87,6 +87,14 @@
         setInnerHtml(input) {
             this._element.innerHTML = input;
         }
+
+        setColorRed() {
+            this._element.style.color = "red";
+        }
+
+        setColorBlack() {
+            this._element.style.color = "black";
+        }
     }
 
     class HtmlInput {
@@ -282,7 +290,13 @@
         if (Player1CardInputs !== null && Player1CardInputs.length > cardId) {
             Player1CardInputs[cardId].hide();
         }
-        Player1CardDiv.setInnerHtml(Player1CardInputs[cardId]._element.value)
+        Player1CardDiv.setInnerHtml(Player1CardInputs[cardId]._element.value);
+        if(Player1CardInputs[cardId]._element.style.color === "red") {
+            Player1CardDiv.setColorRed();
+        }
+        else {
+            Player1CardDiv.setColorBlack();
+        }
     }
 
     function resetGame() {
