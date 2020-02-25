@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 
 <head>
-    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="shared.css" />
+    <link rel="stylesheet" type="text/css" href="rps.css" />
 </head>
 
 <body>
-    <div id="OpponentName">Opponent</div>
-    <div id="OpponentPick">-</div>
-    <div id="YourName">Player</div>
-    <div id="YourPick">-</div>
-    <input id="RockButton" type="button" value="Rock" />
-    <input id="PaperButton" type="button" value="Paper" />
-    <input id="ScissorsButton" type="button" value="Scissors" />
+    <input id="NewOpponentButton" type="button" value="New Opponent (Change Strategy)" />
+    <div id="OpponentName" class="player-name">Opponent</div>
+    <div id="OpponentPick" class="pick-name">-</div>
+    <div id="YourName" class="player-name">Player</div>
+    <div id="YourPick" class="pick-name">-</div>
+    <div id="RPSButtonContainer">
+        <input id="RockButton" class="rps-button" type="button" value="Rock" />
+        <input id="PaperButton" class="rps-button" type="button" value="Paper" />
+        <input id="ScissorsButton" class="rps-button" type="button" value="Scissors" />
+    </div>
     <div id="WinnerMessage">-</div>
 </body>
 <style>
@@ -218,6 +222,11 @@
         
     }
 
+    function getNewOpponent() {
+        resetGame();
+        startGame();
+    }
+
     function startGame() {
         YourNameDiv = new HtmlDiv("YourName", "Player");
         YourPickDiv = new HtmlDiv("YourPick", "-");
@@ -244,6 +253,7 @@
     document.getElementById("RockButton").addEventListener('click', function () { playerInput(0) });
     document.getElementById("PaperButton").addEventListener('click', function () { playerInput(1) });
     document.getElementById("ScissorsButton").addEventListener('click', function () { playerInput(2) });
+    document.getElementById("NewOpponentButton").addEventListener('click', function () { getNewOpponent() });
 
 
     // Main game:
