@@ -57,7 +57,7 @@
     let PlayerBidContainerDiv = null;
     let dealerIndex = null;
     let players = [];
-    let currentBidCount = 0;
+    let currentBidCount = 0; // Once this is higher than 3, bidding is no longer active
     let currentPlayerTurn = null;
     let currentPlayedCards = [null, null, null, null];
     let cardsPlayedThisRound = 0;
@@ -249,7 +249,8 @@
         }
 
         getHandArray() {
-            return this._heartsInHand.concat(this._clubsInHand.concat(this._diamondsInHand.concat(this._spadesInHand)));
+            this._handArray = this._heartsInHand.concat(this._clubsInHand.concat(this._diamondsInHand.concat(this._spadesInHand)));
+            return this._handArray;
         }
 
         findCardToPlay() {
@@ -524,6 +525,10 @@
     }
 
     function playCard(cardId) {
+        // If bidding is still active, don't allow cards to be played
+        if (currentBidCount < 4) {
+            return;
+        }
         if (Player1CardInputs !== null && Player1CardInputs.length > cardId) {
             Player1CardInputs[cardId].hide();
         }
