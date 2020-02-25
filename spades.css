@@ -16,3 +16,24 @@
     text-align: center;
     vertical-align: middle;
 }
+
+#PlayerBidContainer {
+    height: 50px;
+    line-height: 50px;
+}
+
+#BidLabel {
+    display: inline-block;
+}
+
+#PlayerBidInput {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 10px;
+}
+
+#PlayerBidSubmit {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 10px;
+}

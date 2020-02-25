@@ -29,6 +29,11 @@
         <input id="playerCard11" class="player-card" type="button"/>
         <input id="playerCard12" class="player-card" type="button"/>
     </div>
+    <div id="PlayerBidContainer">
+        <div id="BidLabel">Bid:</div>
+        <input id="PlayerBidInput" type="text" />
+        <input id="PlayerBidSubmit" type="button" value="Submit"/>
+    </div>
 </div>
 
 </body>
@@ -48,8 +53,15 @@
     let Player2CardDiv = null;
     let Player3CardDiv = null;
     let Player4CardDiv = null;
+    let PlayerBidInput = null;
+    let PlayerBidContainerDiv = null;
     let dealerIndex = null;
-    let players = [player1, player2, player3, player4];
+    let players = [];
+    let currentBidCount = 0;
+    let currentPlayerTurn = null;
+    let currentPlayedCards = [null, null, null, null];
+    let cardsPlayedThisRound = 0;
+    let spadesBrokenThisGame = false;
 
     let Player1CardInputs = [];
 
@@ -71,7 +83,10 @@
         constructor(divId, defaultInnerHtml) {
             this._divId = divId;
             this._element = document.getElementById(divId);
-            this._element.innerHTML = defaultInnerHtml;
+            // Make defaultInnerHtml optional param
+            if (defaultInnerHtml !== undefined) {
+                this._element.innerHTML = defaultInnerHtml;
+            }
         }
 
         hide() {
@@ -103,7 +118,11 @@
         constructor(inputId, val) {
             this._inputId = inputId;
             this._element = document.getElementById(inputId);
-            this._element.value = val;
+            // Make val optional param
+            if (val !== undefined) {
+                this._element.value = val;
+            }
+            
         }
 
         hide() {
@@ -116,6 +135,10 @@
 
         showInlineBlock() {
             this._element.style.display = "inline-block";
+        }
+
+        getValue() {
+            return this._element.value;
         }
 
         setValue(val) {
@@ -180,12 +203,14 @@
     }
 
     class Player {
-        constructor(name) {
+        constructor(name, isHuman) {
             this._name = name;
+            this._isHuman = isHuman;
             this._spadesInHand = [];
             this._heartsInHand = [];
             this._diamondsInHand = [];
             this._clubsInHand = [];
+            this._bid = null;
         }
 
         addToHand(card) {
@@ -227,6 +252,15 @@
             return this._heartsInHand.concat(this._clubsInHand.concat(this._diamondsInHand.concat(this._spadesInHand)));
         }
 
+        findCardToPlay() {
+            if (cardsPlayedThisRound === 0) {
+                // Just pick a valid card
+            }
+            else {
+                // Follow suit if possible and play a card that will either win or minimize loss in value
+            }
+        }
+
         sortByRank(suitList) {
             suitList.sort((a, b) => (a._rank > b._rank) ? 1 : -1);
         }
@@ -242,6 +276,10 @@
                 
             }
             return result;
+        }
+
+        clearBid() {
+            this._bid = null;
         }
 
         setBid(bidAmount) {
@@ -272,6 +310,9 @@
                     currentBid++;
                 }
                 if (this.containsAKing(this._spadesInHand)) {
+                    currentBid++;
+                }
+                if (this.containsAQueen(this._spadesInHand)) {
                     currentBid++;
                 }
                 
@@ -305,7 +346,7 @@
             if (cardArray.length < 5 && this.containsAnAce(cardArray)) {
                 currentBid++;
             }
-            if (cardArray.length < 3 && this.containsAKing(cardArray)) {
+            if (cardArray.length < 3 && this.containsQueenOrKing(cardArray)) {
                 currentBid++;
             }
             return currentBid;
@@ -322,6 +363,24 @@
 
         containsAKing(cardArray) {
             if (cardArray.find(card => card._rank === 13) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        containsAQueen(cardArray) {
+            if (cardArray.find(card => card._rank === 12) != null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        containsQueenOrKing(cardArray) {
+            if (cardArray.find(card => card._rank === 12) != null || cardArray.find(card => card._rank === 13) != null) {
                 return true;
             }
             else {
@@ -350,10 +409,14 @@
     function startGame() {
         // The Deck constructor should shuffle the cards, so no need to do it again here.
         deck = new Deck();
-        player1 = new Player("Player1");
-        player2 = new Player("COM2");
-        player3 = new Player("COM3");
-        player4 = new Player("COM4");
+        player1 = new Player("Player1", true);
+        player2 = new Player("COM2", false);
+        player3 = new Player("COM3", false);
+        player4 = new Player("COM4", false);
+        players.push(player1);
+        players.push(player2);
+        players.push(player3);
+        players.push(player4);
         dealerIndex = getRandomIntInclusive(0, 3);
 
         // It's not important to deal each card to every player in sequence since we know the cards in the deck are already random.
@@ -381,21 +444,39 @@
         Player2CardDiv = new HtmlDiv("Player2Card", "");
         Player3CardDiv = new HtmlDiv("Player3Card", "");
         Player4CardDiv = new HtmlDiv("Player4Card", "");
+        PlayerBidInput = new HtmlInput("PlayerBidInput");
+        PlayerBidContainerDiv = new HtmlDiv("PlayerBidContainer");
 
-        getNextPlayer(dealerIndex);
-        player1.setBid(player1.determineBid());
-        player2.setBid(player2.determineBid());
-        player3.setBid(player3.determineBid());
-        player4.setBid(player4.determineBid());
-        console.log(player1);
-        console.log(player2);
-        console.log(player3);
-        console.log(player4);
+        currentPlayerTurn = getNextPlayer(dealerIndex);
+        for (i = 0; i < 4; i++) {
+            if (players[currentPlayerTurn]._isHuman) {
+                break;
+            }
+            else {
+                players[currentPlayerTurn].setBid(players[currentPlayerTurn].determineBid());
+            }
+            currentBidCount++;
+            nextTurn();
+        }
+
+
+        // player1.setBid(player1.determineBid());
+        // player2.setBid(player2.determineBid());
+        // player3.setBid(player3.determineBid());
+        // player4.setBid(player4.determineBid());
+        // console.log(player1);
+        // console.log(player2);
+        // console.log(player3);
+        // console.log(player4);
         
     }
 
+    function nextTurn() {
+        currentPlayerTurn = getNextPlayer(currentPlayerTurn);
+    }
+
     function getNextPlayer(playerIndex) {
-        var newIndex = playerIndex++;
+        var newIndex = playerIndex + 1;
         if (newIndex > 3) {
             newIndex = 0;
         }
@@ -414,6 +495,32 @@
         player2.drawFullHand();
         player3.drawFullHand();
         player4.drawFullHand();
+    }
+
+    function submitBid() {
+        let playerBidValue = parseInt(PlayerBidInput.getValue(), 10);
+        if (playerBidValue > -1 && playerBidValue < 14) {
+            player1.setBid(playerBidValue);
+            PlayerBidContainerDiv.hide();
+            currentBidCount++;
+            nextTurn();
+            // Continue computer bidding if there is any more to do
+            if (currentBidCount < 4) {
+                while (currentBidCount < 4) {
+                    players[currentPlayerTurn].setBid(players[currentPlayerTurn].determineBid());
+                    currentBidCount++;
+                    nextTurn();
+                }
+            }
+            // Start gameplay
+            console.log(player1);
+            console.log(player2);
+            console.log(player3);
+            console.log(player4);
+        }
+        else {
+            console.log("Bad bid amount");
+        }
     }
 
     function playCard(cardId) {
@@ -446,6 +553,7 @@
     document.getElementById("playerCard10").addEventListener('click', function () {playCard(10)});
     document.getElementById("playerCard11").addEventListener('click', function () {playCard(11)});
     document.getElementById("playerCard12").addEventListener('click', function () {playCard(12)});
+    document.getElementById("PlayerBidSubmit").addEventListener('click', function () {submitBid()});
 
     // Main game:
     startGame();
