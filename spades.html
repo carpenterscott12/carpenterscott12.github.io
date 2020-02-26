@@ -159,11 +159,10 @@
         constructor(rank, suit) {
             this._rank = rank;
             this._suit = suit;
-            this._discarded = false;
         }
 
-        discard() {
-            this._discarded = true;
+        getString() {
+            return rankStrings[this._rank] + suitStrings[this._suit];
         }
     }
 
@@ -207,30 +206,13 @@
         constructor(name, isHuman) {
             this._name = name;
             this._isHuman = isHuman;
-            this._spadesInHand = [];
-            this._heartsInHand = [];
-            this._diamondsInHand = [];
-            this._clubsInHand = [];
+            this._cards = [[], [], [], []]; // One empty array per suit
             this._bid = null;
+            this._tricksTaken = 0;
         }
 
         addToHand(card) {
-            switch (card._suit) {
-                case Suit.Spade:
-                    this._spadesInHand.push(card);
-                    break;
-                case Suit.Heart:
-                    this._heartsInHand.push(card);
-                    break;
-                case Suit.Diamond:
-                    this._diamondsInHand.push(card);
-                    break;
-                case Suit.Club:
-                    this._clubsInHand.push(card);
-                    break;
-                default:
-                    console.log("The suit was not valid.");
-            }
+            this._cards[card._suit].push(card);
         }
 
         drawFullHand() {
@@ -239,10 +221,10 @@
                 for (i = 0; i < 13; i++) {
                     this.addToHand(deck.draw());
                 }
-                this.sortByRank(this._spadesInHand);
-                this.sortByRank(this._heartsInHand);
-                this.sortByRank(this._diamondsInHand);
-                this.sortByRank(this._clubsInHand);
+                this.sortByRank(this._cards[Suit.Spade]);
+                this.sortByRank(this._cards[Suit.Heart]);
+                this.sortByRank(this._cards[Suit.Club]);
+                this.sortByRank(this._cards[Suit.Diamond]);
             }
             else {
                 console.log("The deck contained less than 13 cards when trying to deal a full hand.");
@@ -250,17 +232,36 @@
         }
 
         getHandArray() {
-            this._handArray = this._heartsInHand.concat(this._clubsInHand.concat(this._diamondsInHand.concat(this._spadesInHand)));
+            this._handArray = this._cards[Suit.Heart].concat(this._cards[Suit.Club].concat(this._cards[Suit.Diamond].concat(this._cards[Suit.Spade])));
             return this._handArray;
         }
 
         findCardToPlay() {
+            // TODO: Remember to handle nil bid
             if (cardsPlayedThisRound === 0) {
                 // Just pick a valid card
+                if (spadesBrokenThisGame) {
+                    // Consider spades as a lead suit
+                }
+                else {
+                    // Only consider hearts, clubs, and diamonds as lead suits
+                }
             }
             else {
                 // Follow suit if possible and play a card that will either win or minimize loss in value
+                // If the bid isn't met yet, you need to be more aggressive
+                // TODO: Remember to combine this with the partner's bid. If my partner bid nil, then I need to be more aggressive in my play to protect them.
+                if (this._tricksTaken <= this._bid) {
+                    return this.getCardThatBeatsOrGoesLow();
+                }
+                else {
+                    // I don't have to be as aggressive
+                }
             }
+        }
+
+        getCardThatBeatsOrGoesLow() {
+
         }
 
         sortByRank(suitList) {
@@ -271,7 +272,7 @@
             let result = "";
             let i = 0;
             for (i = 0; i < suitList.length; i++) {
-                result += rankStrings[suitList[i]._rank] + suitStrings[suitList[i]._suit];
+                result += suitList[i].getString();
                 if (i != suitList.length - 1) {
                     result += " ";
                 }
@@ -295,9 +296,9 @@
 
         determineBid() {
             let currentBid = 0;
-            if (this._spadesInHand.length === 0) {
+            if (this._cards[0].length === 0) {
                 // Check if I have any aces or face cards. If not, I probably want to bid nil this hand
-                if (containsQueenOrHigher(this._heartsInHand) || containsQueenOrHigher(this._clubsInHand) || containsQueenOrHigher(this._diamondsInHand)) {
+                if (containsQueenOrHigher(this._cards[Suit.Heart]) || containsQueenOrHigher(this._cards[Suit.Diamond]) || containsQueenOrHigher(this._cards[Suit.Club])) {
                     // Look for aces
 
                 }
@@ -308,37 +309,37 @@
             }
             else {
                 // If I have the ace of spades, that's a guaranteed trick.
-                if (this.containsAnAce(this._spadesInHand)) {
+                if (this.containsAnAce(this._cards[Suit.Spade])) {
                     currentBid++;
                 }
-                if (this.containsAKing(this._spadesInHand)) {
+                if (this.containsAKing(this._cards[Suit.Spade])) {
                     currentBid++;
                 }
-                if (this.containsAQueen(this._spadesInHand)) {
+                if (this.containsAQueen(this._cards[Suit.Spade])) {
                     currentBid++;
                 }
                 
-                if (this._spadesInHand.length > 2) {
+                if (this._cards[Suit.Spade].length > 2) {
                     // If there are low counts of cards in one of these suits, spades will probably be useful there
-                    if (this._heartsInHand.length < 3) {
+                    if (this._cards[Suit.Heart].length < 3) {
                         currentBid++;
                     }
-                    if (this._clubsInHand.length < 3) {
+                    if (this._cards[Suit.Diamond].length < 3) {
                         currentBid++;
                     }
-                    if (this._diamondsInHand.length < 3) {
+                    if (this._cards[Suit.Club].length < 3) {
                         currentBid++;
                     }
                 }
                 // If we have 5 spades, assume that we'll be able to get at least one more trick
-                if (this._spadesInHand.length > 4) {
+                if (this._cards[0].length > 4) {
                     currentBid++;
                 }
             }
 
-            currentBid += this.getSuitBidCount(this._heartsInHand);
-            currentBid += this.getSuitBidCount(this._clubsInHand);
-            currentBid += this.getSuitBidCount(this._diamondsInHand);
+            currentBid += this.getSuitBidCount(this._cards[Suit.Heart]);
+            currentBid += this.getSuitBidCount(this._cards[Suit.Diamond]);
+            currentBid += this.getSuitBidCount(this._cards[Suit.Club]);
 
             return currentBid;
         }
@@ -394,14 +395,9 @@
             let result = false;
             let i = 0;
             for (i = 0; i < cardArray.length; i++) {
-                if (cardArray[i]._discarded) {
-                    continue;
-                }
-                else {
-                    if (cardArray[i]._rank > 11) {
-                        result = true;
-                        break;
-                    }
+                if (cardArray[i]._rank > 11) {
+                    result = true;
+                    break;
                 }
             }
         }
@@ -432,7 +428,7 @@
         let i = 0;
         for (i = 0; i < player1HandArray.length; i++) {
             let currentCard = player1HandArray[i];
-            let htmlInput = new HtmlInput("playerCard" + i, rankStrings[currentCard._rank] + suitStrings[currentCard._suit]);
+            let htmlInput = new HtmlInput("playerCard" + i, currentCard.getString());
             if (currentCard._suit === Suit.Diamond || currentCard._suit === Suit.Heart) {
                 htmlInput.setColorRed();
             }
@@ -460,17 +456,6 @@
             currentBidCount++;
             nextTurn();
         }
-
-
-        // player1.setBid(player1.determineBid());
-        // player2.setBid(player2.determineBid());
-        // player3.setBid(player3.determineBid());
-        // player4.setBid(player4.determineBid());
-        // console.log(player1);
-        // console.log(player2);
-        // console.log(player3);
-        // console.log(player4);
-        
     }
 
     function nextTurn() {
