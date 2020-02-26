@@ -63,20 +63,21 @@
     let currentPlayedCards = [null, null, null, null];
     let cardsPlayedThisRound = 0;
     let spadesBrokenThisGame = false;
-
-    let Player1CardInputs = [];
+    let currentRoundSuit = null;
+    let highestCurrentRoundCard = null;
+    let Player1CardsWithInputs = [];
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
-    const suitStrings = ["♠", "♥", "♦", "♣"];
+    const suitStrings = ["♠", "♥", "♣", "♦"];
 
     // Enums
     const Suit = {
         Spade: 0,
         Heart: 1,
-        Diamond: 2,
-        Club: 3
+        Club: 2,
+        Diamond: 3
     }
 
     // Classes
@@ -123,7 +124,6 @@
             if (val !== undefined) {
                 this._element.value = val;
             }
-            
         }
 
         hide() {
@@ -155,6 +155,13 @@
         }
     }
 
+    class CardWithHtmlInput {
+        constructor(card, htmlInput) {
+            this._card = card;
+            this._htmlInput = htmlInput;
+        }
+    }
+
     class Card {
         constructor(rank, suit) {
             this._rank = rank;
@@ -163,6 +170,14 @@
 
         getString() {
             return rankStrings[this._rank] + suitStrings[this._suit];
+        }
+
+        isRed() {
+            return (this._suit === Suit.Heart || this._suit === Suit.Diamond);
+        }
+
+        isBlack() {
+            return (this._suit === Suit.Spade || this._suit === Suit.Club);
         }
     }
 
@@ -203,12 +218,13 @@
     }
 
     class Player {
-        constructor(name, isHuman) {
+        constructor(name, isHuman, playAreaDivId) {
             this._name = name;
             this._isHuman = isHuman;
             this._cards = [[], [], [], []]; // One empty array per suit
             this._bid = null;
             this._tricksTaken = 0;
+            this._playAreaDiv = new HtmlDiv(playAreaDivId);
         }
 
         addToHand(card) {
@@ -231,9 +247,99 @@
             }
         }
 
+        updatePlayArea(card) {
+            this._playAreaDiv.setInnerHtml(card.getString());
+            if (card.isRed()) {
+                this._playAreaDiv.setColorRed();
+            }
+            else if (card.isBlack()) {
+                this._playAreaDiv.setColorBlack();
+            }
+        }
+
+        incrementTricks() {
+            this._tricksTaken++;
+            // Write the new tricks value to the player's info area
+        }
+
         getHandArray() {
             this._handArray = this._cards[Suit.Heart].concat(this._cards[Suit.Club].concat(this._cards[Suit.Diamond].concat(this._cards[Suit.Spade])));
             return this._handArray;
+        }
+
+        playCard(card) {
+            cardsPlayedThisRound++;
+            if (spadesBrokenThisGame === false && card._suit === Suit.Spade) {
+                spadesBrokenThisGame = true;
+            }
+            currentPlayedCards[currentPlayerTurn] = card;
+            
+            console.log("Player " + this._name + " played: " + card.getString());
+
+            this.updatePlayArea(card);
+
+            if (cardsPlayedThisRound === 4) {
+                // Set score and reset round state
+                cardsPlayedThisRound = 0;
+                let winnerIndex = null;
+                let i = 0;
+                for (i = 0; i < currentPlayedCards.length; i++) {
+                    if (winnerIndex === null) {
+                        winnerIndex = i;
+                    }
+                    else {
+                        let currentCard = currentPlayedCards[i];
+                        let winnerCard = currentPlayedCards[winnerIndex];
+                        // If suits are the same, take the higher rank.
+                        if (currentCard._suit === winnerCard._suit) {
+                            if (currentCard._rank > winnerCard._rank) {
+                                winnerIndex = i;
+                            }
+                        }
+                        else if (currentCard._suit === Suit.Spade) {
+                            // If suit is spade, this wins because the current winner is not a spade.
+                            winnerIndex = i;
+                        }
+                        else if (currentCard._suit === currentRoundSuit) {
+                            // If the suit is the current round's suit to follow, this wins because the current winner is neither a spade nor the suit to follow.
+                            winnerIndex = i;
+                        }
+                        else {
+                            // This case means neither this card nor the current winner are the current suit to follow or spades, so it doesn't matter if I set winnerIndex to i here.
+                            winnerIndex = i;
+                        }
+                    }
+                }
+                players[winnerIndex].incrementTricks();
+
+                currentPlayedCards = [null, null, null, null];
+                // Clear all played cards displays
+                // Indicate whose turn it is
+            }
+            else {
+                if (highestCurrentRoundCard !== null) {
+                    if (card._suit === Suit.Spade && highestCurrentRoundCard._suit !== Suit.Spade) {
+                        highestCurrentRoundCard = card;
+                    }
+                    else if (highestCurrentRoundCard._suit !== Suit.Spade) {
+                        if (card._suit === highestCurrentRoundCard._suit) {
+                            if (card._rank > highestCurrentRoundCard._rank) {
+                                highestCurrentRoundCard = card;
+                            }
+                        }
+                    }
+                }
+                else {
+                    highestCurrentRoundCard = card;
+                    currentRoundSuit = card._suit;
+                }
+            }
+            
+            nextTurn();
+            let nextPlayer = players[currentPlayerTurn];
+            if (nextPlayer._isHuman === false) {
+                nextPlayer.playCard(nextPlayer.findCardToPlay());
+            }
         }
 
         findCardToPlay() {
@@ -242,26 +348,145 @@
                 // Just pick a valid card
                 if (spadesBrokenThisGame) {
                     // Consider spades as a lead suit
+                    let nonSpadeAce = this.getNonSpadeAce();
+                    if (nonSpadeAce !== null) {
+                        return nonSpadeAce;
+                    }
+                    let highestSpade = this.getHighestAvailableSpade();
+                    if (highestSpade !== null) {
+                        return highestSpade;
+                    }
+                    else {
+                        let lowestSpade = this.getLowestSpade();
+                        if (lowestSpade !== null) {
+                            return lowestSpade;
+                        }
+                        return this.getLowestAvailableCardNotASpade();
+                    }
                 }
                 else {
                     // Only consider hearts, clubs, and diamonds as lead suits
+                    let highestNonSpade = this.getHighestAvailableCardNoSpades();
+                    if (highestNonSpade !== null) {
+                        return highestNonSpade;
+                    }
+                    let lowest = this.getLowestAvailableCardNotASpade();
+                    if (lowest !== null) {
+                        return lowest;
+                    }
+                    else {
+                        return this.getLowestSpade();
+                    }
                 }
             }
             else {
                 // Follow suit if possible and play a card that will either win or minimize loss in value
-                // If the bid isn't met yet, you need to be more aggressive
-                // TODO: Remember to combine this with the partner's bid. If my partner bid nil, then I need to be more aggressive in my play to protect them.
-                if (this._tricksTaken <= this._bid) {
+                if (this._cards[currentRoundSuit].length > 0) {
                     return this.getCardThatBeatsOrGoesLow();
                 }
                 else {
-                    // I don't have to be as aggressive
+                    // You can either play a spade or throw off a bad card from another suit
+                    if (this._tricksTaken < this._bid) {
+                        let lowestSpade = this.getLowestSpade();
+                        if (lowestSpade !== null) {
+                            return lowestSpade;
+                        }
+                        else {
+                            return this.getLowestAvailableCard();
+                        }
+                    }
+                    else {
+                        return this.getLowestAvailableCard();
+                    }
                 }
             }
         }
 
-        getCardThatBeatsOrGoesLow() {
+        getNonSpadeAce() {
+            let i = 1;
+            for (i = 1; i < this._cards.length; i++) {
+                if (this.containsAnAce(this._cards[i])) {
+                    return this._cards[i].shift();
+                }
+            }
+        }
 
+        getHighestAvailableCardNoSpades() {
+            let i = 1;
+            for (i = 1; i < this._cards.length; i++) {
+                if (this.containsAnAce(this._cards[i])) {
+                    return this._cards[i].shift();
+                }
+            }
+            for (i = 1; i < this._cards.length; i++) {
+                if (this.containsAKing(this._cards[i])) {
+                    return this._cards[i].shift();
+                }
+            }
+            for (i = 1; i < this._cards.length; i++) {
+                if (this.containsAQueen(this._cards[i])) {
+                    return this._cards[i].shift();
+                }
+            }
+            return null;
+        }
+
+        getHighestAvailableSpade() {
+            if (this.containsAnAce(this._cards[0])) {
+                return this._cards[0].shift();
+            }
+            if (this.containsAKing(this._cards[0])) {
+                return this._cards[0].shift();
+            }
+            if (this.containsAQueen(this._cards[0])) {
+                return this._cards[0].shift();
+            }
+            return null;
+        }
+
+        getLowestAvailableCard() {
+            let lowest = this.getLowestAvailableCardNotASpade();
+            if (lowest !== null) {
+                return lowest;
+            }
+            if (this._cards[0].length > 0) {
+                return this._cards[0].shift();
+            }
+        }
+
+        getLowestAvailableCardNotASpade() {
+            if (this._cards[1].length > 0) {
+                return this._cards[1].shift();
+            }
+            if (this._cards[2].length > 0) {
+                return this._cards[2].shift();
+            }
+            if (this._cards[3].length > 0) {
+                return this._cards[3].shift();
+            }
+            return null;
+        }
+
+        getLowestSpade() {
+            if (this._cards[0].length > 0) {
+                return this._cards[0].shift();
+            }
+            else {
+                return null;
+            }
+        }
+
+        getCardThatBeatsOrGoesLow() {
+            let suitCards = this._cards[currentRoundSuit];
+            if (highestCurrentRoundCard._suit === Suit.Spade) {
+                return suitCards.shift(); // Return lowest card
+            }
+            if (highestCurrentRoundCard._rank > suitCards[suitCards.length - 1]._rank) {
+                return suitCards.shift(); // Return lowest card
+            }
+            else {
+                return suitCards.pop(); // Return highest card
+            }
         }
 
         sortByRank(suitList) {
@@ -296,15 +521,11 @@
 
         determineBid() {
             let currentBid = 0;
-            if (this._cards[0].length === 0) {
+            if (this._cards[Suit.Spade].length === 0) {
                 // Check if I have any aces or face cards. If not, I probably want to bid nil this hand
-                if (containsQueenOrHigher(this._cards[Suit.Heart]) || containsQueenOrHigher(this._cards[Suit.Diamond]) || containsQueenOrHigher(this._cards[Suit.Club])) {
-                    // Look for aces
-
-                }
-                else {
+                if (!this.containsQueenOrHigher(this._cards[Suit.Heart]) && !this.containsQueenOrHigher(this._cards[Suit.Diamond]) && !this.containsQueenOrHigher(this._cards[Suit.Club])) {
                     // bid nil
-                    return currentBid; 
+                    return currentBid;
                 }
             }
             else {
@@ -392,14 +613,14 @@
         }
 
         containsQueenOrHigher(cardArray) {
-            let result = false;
             let i = 0;
             for (i = 0; i < cardArray.length; i++) {
                 if (cardArray[i]._rank > 11) {
-                    result = true;
+                    return true;
                     break;
                 }
             }
+            return false;
         }
     }
 
@@ -407,10 +628,10 @@
     function startGame() {
         // The Deck constructor should shuffle the cards, so no need to do it again here.
         deck = new Deck();
-        player1 = new Player("Player1", true);
-        player2 = new Player("COM2", false);
-        player3 = new Player("COM3", false);
-        player4 = new Player("COM4", false);
+        player1 = new Player("Player1", true, "Player1Card");
+        player2 = new Player("COM2", false, "Player2Card");
+        player3 = new Player("COM3", false, "Player3Card");
+        player4 = new Player("COM4", false, "Player4Card");
         players.push(player1);
         players.push(player2);
         players.push(player3);
@@ -435,7 +656,7 @@
             if (currentCard._suit === Suit.Club || currentCard._suit === Suit.Spade) {
                 htmlInput.setColorBlack();
             }
-            Player1CardInputs.push(htmlInput);
+            Player1CardsWithInputs.push(new CardWithHtmlInput(currentCard, htmlInput));
         }
 
         Player1CardDiv = new HtmlDiv("Player1Card", "");
@@ -504,22 +725,29 @@
             console.log(player2);
             console.log(player3);
             console.log(player4);
+
+            let currentPlayer = players[currentPlayerTurn];
+            if (currentPlayer._isHuman === false) {
+                currentPlayer.playCard(currentPlayer.findCardToPlay());
+            }
+
         }
         else {
             console.log("Bad bid amount");
         }
     }
 
-    function playCard(cardId) {
+    function selectCard(cardId) {
         // If bidding is still active, don't allow cards to be played
         if (currentBidCount < 4) {
             return;
         }
-        if (Player1CardInputs !== null && Player1CardInputs.length > cardId) {
-            Player1CardInputs[cardId].hide();
+        if (Player1CardsWithInputs !== null && Player1CardsWithInputs.length > cardId) {
+            Player1CardsWithInputs[cardId]._htmlInput.hide();
+            player1.playCard(Player1CardsWithInputs[cardId]._card);
         }
-        Player1CardDiv.setInnerHtml(Player1CardInputs[cardId]._element.value);
-        if(Player1CardInputs[cardId]._element.style.color === "red") {
+        Player1CardDiv.setInnerHtml(Player1CardsWithInputs[cardId]._htmlInput._element.value);
+        if(Player1CardsWithInputs[cardId]._htmlInput._element.style.color === "red") {
             Player1CardDiv.setColorRed();
         }
         else {
@@ -531,19 +759,19 @@
 
     }
 
-    document.getElementById("playerCard0").addEventListener('click', function () {playCard(0)});
-    document.getElementById("playerCard1").addEventListener('click', function () {playCard(1)});
-    document.getElementById("playerCard2").addEventListener('click', function () {playCard(2)});
-    document.getElementById("playerCard3").addEventListener('click', function () {playCard(3)});
-    document.getElementById("playerCard4").addEventListener('click', function () {playCard(4)});
-    document.getElementById("playerCard5").addEventListener('click', function () {playCard(5)});
-    document.getElementById("playerCard6").addEventListener('click', function () {playCard(6)});
-    document.getElementById("playerCard7").addEventListener('click', function () {playCard(7)});
-    document.getElementById("playerCard8").addEventListener('click', function () {playCard(8)});
-    document.getElementById("playerCard9").addEventListener('click', function () {playCard(9)});
-    document.getElementById("playerCard10").addEventListener('click', function () {playCard(10)});
-    document.getElementById("playerCard11").addEventListener('click', function () {playCard(11)});
-    document.getElementById("playerCard12").addEventListener('click', function () {playCard(12)});
+    document.getElementById("playerCard0").addEventListener('click', function () {selectCard(0)});
+    document.getElementById("playerCard1").addEventListener('click', function () {selectCard(1)});
+    document.getElementById("playerCard2").addEventListener('click', function () {selectCard(2)});
+    document.getElementById("playerCard3").addEventListener('click', function () {selectCard(3)});
+    document.getElementById("playerCard4").addEventListener('click', function () {selectCard(4)});
+    document.getElementById("playerCard5").addEventListener('click', function () {selectCard(5)});
+    document.getElementById("playerCard6").addEventListener('click', function () {selectCard(6)});
+    document.getElementById("playerCard7").addEventListener('click', function () {selectCard(7)});
+    document.getElementById("playerCard8").addEventListener('click', function () {selectCard(8)});
+    document.getElementById("playerCard9").addEventListener('click', function () {selectCard(9)});
+    document.getElementById("playerCard10").addEventListener('click', function () {selectCard(10)});
+    document.getElementById("playerCard11").addEventListener('click', function () {selectCard(11)});
+    document.getElementById("playerCard12").addEventListener('click', function () {selectCard(12)});
     document.getElementById("PlayerBidSubmit").addEventListener('click', function () {submitBid()});
 
     // Main game:
