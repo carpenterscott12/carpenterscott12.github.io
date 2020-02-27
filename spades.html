@@ -8,34 +8,34 @@
 
 <body>
 
-<div id="GameContainer">
-    <div id="PlayArea">
-        <div id="Player4Card" class="play-area-card"></div>
-        <div id="Player3Card" class="play-area-card"></div>
-        <div id="Player2Card" class="play-area-card"></div>
-        <div id="Player1Card" class="play-area-card"></div>
+    <div id="GameContainer">
+        <div id="PlayArea">
+            <div id="Player4Card" class="play-area-card"></div>
+            <div id="Player3Card" class="play-area-card"></div>
+            <div id="Player2Card" class="play-area-card"></div>
+            <div id="Player1Card" class="play-area-card"></div>
+        </div>
+        <div id="PlayerCardsContainer">
+            <input id="playerCard0" class="player-card" type="button" />
+            <input id="playerCard1" class="player-card" type="button" />
+            <input id="playerCard2" class="player-card" type="button" />
+            <input id="playerCard3" class="player-card" type="button" />
+            <input id="playerCard4" class="player-card" type="button" />
+            <input id="playerCard5" class="player-card" type="button" />
+            <input id="playerCard6" class="player-card" type="button" />
+            <input id="playerCard7" class="player-card" type="button" />
+            <input id="playerCard8" class="player-card" type="button" />
+            <input id="playerCard9" class="player-card" type="button" />
+            <input id="playerCard10" class="player-card" type="button" />
+            <input id="playerCard11" class="player-card" type="button" />
+            <input id="playerCard12" class="player-card" type="button" />
+        </div>
+        <div id="PlayerBidContainer">
+            <div id="BidLabel">Bid:</div>
+            <input id="PlayerBidInput" type="text" />
+            <input id="PlayerBidSubmit" type="button" value="Submit" />
+        </div>
     </div>
-    <div id="PlayerCardsContainer">
-        <input id="playerCard0" class="player-card" type="button"/>
-        <input id="playerCard1" class="player-card" type="button"/>
-        <input id="playerCard2" class="player-card" type="button"/>
-        <input id="playerCard3" class="player-card" type="button"/>
-        <input id="playerCard4" class="player-card" type="button"/>
-        <input id="playerCard5" class="player-card" type="button"/>
-        <input id="playerCard6" class="player-card" type="button"/>
-        <input id="playerCard7" class="player-card" type="button"/>
-        <input id="playerCard8" class="player-card" type="button"/>
-        <input id="playerCard9" class="player-card" type="button"/>
-        <input id="playerCard10" class="player-card" type="button"/>
-        <input id="playerCard11" class="player-card" type="button"/>
-        <input id="playerCard12" class="player-card" type="button"/>
-    </div>
-    <div id="PlayerBidContainer">
-        <div id="BidLabel">Bid:</div>
-        <input id="PlayerBidInput" type="text" />
-        <input id="PlayerBidSubmit" type="button" value="Submit"/>
-    </div>
-</div>
 
 </body>
 <style>
@@ -66,6 +66,7 @@
     let currentRoundSuit = null;
     let highestCurrentRoundCard = null;
     let Player1CardsWithInputs = [];
+    let totalRoundsPlayed = 0;
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -273,7 +274,7 @@
                 spadesBrokenThisGame = true;
             }
             currentPlayedCards[currentPlayerTurn] = card;
-            
+
             console.log("Player " + this._name + " played: " + card.getString());
 
             this.updatePlayArea(card);
@@ -310,11 +311,40 @@
                         }
                     }
                 }
+                
                 players[winnerIndex].incrementTricks();
+                //TODO: Indicate player's trick count vs bid count in the UI
 
                 currentPlayedCards = [null, null, null, null];
-                // Clear all played cards displays
-                // Indicate whose turn it is
+                highestCurrentRoundCard = null;
+                currentRoundSuit = null;
+                clearPlayAreaCards();
+
+
+                totalRoundsPlayed++;
+                if (totalRoundsPlayed === 13) {
+                    // TODO: End the current game and restart with the total scores for each partnership recorded
+                }
+
+                // TODO: Indicate whose turn it is through the UI
+                currentPlayerTurn = winnerIndex;
+                let newRoundPlayer = players[currentPlayerTurn];
+
+                console.log(player1);
+                console.log(player2);
+                console.log(player3);
+                console.log(player4);
+
+                if (!newRoundPlayer._isHuman) {
+                    if (newRoundPlayer._cards[1].length === 0) {
+                        console.log("Hearts suit has zero cards.");
+                    }
+                    newRoundPlayer.playCard(newRoundPlayer.findCardToPlay());
+                    return;
+                }
+                else {
+                    return;
+                }
             }
             else {
                 if (highestCurrentRoundCard !== null) {
@@ -334,12 +364,13 @@
                     currentRoundSuit = card._suit;
                 }
             }
-            
+
             nextTurn();
             let nextPlayer = players[currentPlayerTurn];
             if (nextPlayer._isHuman === false) {
                 nextPlayer.playCard(nextPlayer.findCardToPlay());
             }
+            return;
         }
 
         findCardToPlay() {
@@ -361,7 +392,13 @@
                         if (lowestSpade !== null) {
                             return lowestSpade;
                         }
-                        return this.getLowestAvailableCardNotASpade();
+                        let lowestCardAvailable = this.getLowestAvailableCard();
+                        if (lowestCardAvailable !== null) {
+                            return lowestCardAvailable;
+                        }
+                        else {
+                            console.log("Error: Lowest card available was null.");
+                        }
                     }
                 }
                 else {
@@ -375,14 +412,49 @@
                         return lowest;
                     }
                     else {
-                        return this.getLowestSpade();
+                        let lowestSpade = this.getLowestSpade();
+                        if (lowestSpade !== null) {
+                            return lowestSpade;
+                        }
+                        else {
+                            console.log("Error: Lowest spade was null.");
+                        }
                     }
                 }
             }
             else {
                 // Follow suit if possible and play a card that will either win or minimize loss in value
                 if (this._cards[currentRoundSuit].length > 0) {
-                    return this.getCardThatBeatsOrGoesLow();
+                    let followSuitCard = this.getCardThatBeatsOrGoesLow();
+                    if (followSuitCard !== null) {
+                        return followSuitCard;
+                    }
+                    else {
+                        if (this._tricksTaken < this._bid) {
+                            let lowestSpade = this.getLowestSpade();
+                            if (lowestSpade !== null) {
+                                return lowestSpade;
+                            }
+                            else {
+                                let lowestAvailable = this.getLowestAvailableCard();
+                                if (lowestAvailable !== null) {
+                                    return lowestAvailable;
+                                }
+                                else {
+                                    console.log("Error: This lowest available was null.");
+                                }
+                            }
+                        }
+                        else {
+                            let lowestCard = this.getLowestAvailableCard();
+                            if (lowestCard !== null) {
+                                return lowestCard;
+                            }
+                            else {
+                                console.log("Error: The lowest available card was null.");
+                            }
+                        }
+                    }
                 }
                 else {
                     // You can either play a spade or throw off a bad card from another suit
@@ -392,11 +464,23 @@
                             return lowestSpade;
                         }
                         else {
-                            return this.getLowestAvailableCard();
+                            let lowestAvailableCard = this.getLowestAvailableCard();
+                            if (lowestAvailableCard !== null) {
+                                return lowestAvailableCard;
+                            }
+                            else {
+                                console.log("Error: That lowest available card was null.");
+                            }
                         }
                     }
                     else {
-                        return this.getLowestAvailableCard();
+                        let lowestAvailCard = this.getLowestAvailableCard();
+                        if (lowestAvailCard !== null) {
+                            return lowestAvailCard;
+                        }
+                        else {
+                            console.log("Error: The lowest avail card was null.");
+                        }
                     }
                 }
             }
@@ -405,41 +489,42 @@
         getNonSpadeAce() {
             let i = 1;
             for (i = 1; i < this._cards.length; i++) {
-                if (this.containsAnAce(this._cards[i])) {
-                    return this._cards[i].shift();
+                if (this.containsAnAce(this._cards[i]) === true) {
+                    return this._cards[i].pop();
                 }
             }
+            return null;
         }
 
         getHighestAvailableCardNoSpades() {
             let i = 1;
             for (i = 1; i < this._cards.length; i++) {
-                if (this.containsAnAce(this._cards[i])) {
-                    return this._cards[i].shift();
+                if (this.containsAnAce(this._cards[i]) === true) {
+                    return this._cards[i].pop();
                 }
             }
             for (i = 1; i < this._cards.length; i++) {
-                if (this.containsAKing(this._cards[i])) {
-                    return this._cards[i].shift();
+                if (this.containsAKing(this._cards[i]) === true) {
+                    return this._cards[i].pop();
                 }
             }
             for (i = 1; i < this._cards.length; i++) {
-                if (this.containsAQueen(this._cards[i])) {
-                    return this._cards[i].shift();
+                if (this.containsAQueen(this._cards[i]) === true) {
+                    return this._cards[i].pop();
                 }
             }
             return null;
         }
 
         getHighestAvailableSpade() {
-            if (this.containsAnAce(this._cards[0])) {
-                return this._cards[0].shift();
+            if (this.containsAnAce(this._cards[0]) === true) {
+                return this._cards[0].pop();
             }
-            if (this.containsAKing(this._cards[0])) {
-                return this._cards[0].shift();
+            if (this.containsAKing(this._cards[0]) === true) {
+                return this._cards[0].pop();
             }
-            if (this.containsAQueen(this._cards[0])) {
-                return this._cards[0].shift();
+            if (this.containsAQueen(this._cards[0]) === true) {
+                return this._cards[0].pop();
             }
             return null;
         }
@@ -452,6 +537,7 @@
             if (this._cards[0].length > 0) {
                 return this._cards[0].shift();
             }
+            return null;
         }
 
         getLowestAvailableCardNotASpade() {
@@ -478,6 +564,9 @@
 
         getCardThatBeatsOrGoesLow() {
             let suitCards = this._cards[currentRoundSuit];
+            if (suitCards.length === 0) {
+                return null;
+            }
             if (highestCurrentRoundCard._suit === Suit.Spade) {
                 return suitCards.shift(); // Return lowest card
             }
@@ -501,7 +590,7 @@
                 if (i != suitList.length - 1) {
                     result += " ";
                 }
-                
+
             }
             return result;
         }
@@ -523,23 +612,23 @@
             let currentBid = 0;
             if (this._cards[Suit.Spade].length === 0) {
                 // Check if I have any aces or face cards. If not, I probably want to bid nil this hand
-                if (!this.containsQueenOrHigher(this._cards[Suit.Heart]) && !this.containsQueenOrHigher(this._cards[Suit.Diamond]) && !this.containsQueenOrHigher(this._cards[Suit.Club])) {
+                if (this.containsQueenOrHigher(this._cards[Suit.Heart]) === false && this.containsQueenOrHigher(this._cards[Suit.Diamond]) === false && this.containsQueenOrHigher(this._cards[Suit.Club]) === false) {
                     // bid nil
                     return currentBid;
                 }
             }
             else {
                 // If I have the ace of spades, that's a guaranteed trick.
-                if (this.containsAnAce(this._cards[Suit.Spade])) {
+                if (this.containsAnAce(this._cards[Suit.Spade]) === true) {
                     currentBid++;
                 }
-                if (this.containsAKing(this._cards[Suit.Spade])) {
+                if (this.containsAKing(this._cards[Suit.Spade]) === true) {
                     currentBid++;
                 }
-                if (this.containsAQueen(this._cards[Suit.Spade])) {
+                if (this.containsAQueen(this._cards[Suit.Spade]) === true) {
                     currentBid++;
                 }
-                
+
                 if (this._cards[Suit.Spade].length > 2) {
                     // If there are low counts of cards in one of these suits, spades will probably be useful there
                     if (this._cards[Suit.Heart].length < 3) {
@@ -567,17 +656,17 @@
 
         getSuitBidCount(cardArray) {
             let currentBid = 0;
-            if (cardArray.length < 5 && this.containsAnAce(cardArray)) {
+            if (cardArray.length < 5 && this.containsAnAce(cardArray) === true) {
                 currentBid++;
             }
-            if (cardArray.length < 3 && this.containsQueenOrKing(cardArray)) {
+            if (cardArray.length < 3 && this.containsQueenOrKing(cardArray) === true) {
                 currentBid++;
             }
             return currentBid;
         }
 
         containsAnAce(cardArray) {
-            if (cardArray.find(card => card._rank === 14) != null) {
+            if (cardArray.find(card => card._rank === 14) !== undefined) {
                 return true;
             }
             else {
@@ -586,7 +675,7 @@
         }
 
         containsAKing(cardArray) {
-            if (cardArray.find(card => card._rank === 13) != null) {
+            if (cardArray.find(card => card._rank === 13) !== undefined) {
                 return true;
             }
             else {
@@ -595,7 +684,7 @@
         }
 
         containsAQueen(cardArray) {
-            if (cardArray.find(card => card._rank === 12) != null) {
+            if (cardArray.find(card => card._rank === 12) !== undefined) {
                 return true;
             }
             else {
@@ -604,7 +693,7 @@
         }
 
         containsQueenOrKing(cardArray) {
-            if (cardArray.find(card => card._rank === 12) != null || cardArray.find(card => card._rank === 13) != null) {
+            if (cardArray.find(card => card._rank === 12) !== undefined || cardArray.find(card => card._rank === 13) !== undefined) {
                 return true;
             }
             else {
@@ -617,7 +706,6 @@
             for (i = 0; i < cardArray.length; i++) {
                 if (cardArray[i]._rank > 11) {
                     return true;
-                    break;
                 }
             }
             return false;
@@ -692,10 +780,10 @@
     }
 
     function getRandomIntInclusive(min, max) {
-            min = Math.ceil(min);
-            max = Math.floor(max);
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
     function dealNewHand() {
         deck = new Deck();
@@ -746,33 +834,33 @@
             Player1CardsWithInputs[cardId]._htmlInput.hide();
             player1.playCard(Player1CardsWithInputs[cardId]._card);
         }
-        Player1CardDiv.setInnerHtml(Player1CardsWithInputs[cardId]._htmlInput._element.value);
-        if(Player1CardsWithInputs[cardId]._htmlInput._element.style.color === "red") {
-            Player1CardDiv.setColorRed();
-        }
-        else {
-            Player1CardDiv.setColorBlack();
-        }
+    }
+
+    function clearPlayAreaCards() {
+        Player1CardDiv.setInnerHtml('');
+        Player2CardDiv.setInnerHtml('');
+        Player3CardDiv.setInnerHtml('');
+        Player4CardDiv.setInnerHtml('');
     }
 
     function resetGame() {
 
     }
 
-    document.getElementById("playerCard0").addEventListener('click', function () {selectCard(0)});
-    document.getElementById("playerCard1").addEventListener('click', function () {selectCard(1)});
-    document.getElementById("playerCard2").addEventListener('click', function () {selectCard(2)});
-    document.getElementById("playerCard3").addEventListener('click', function () {selectCard(3)});
-    document.getElementById("playerCard4").addEventListener('click', function () {selectCard(4)});
-    document.getElementById("playerCard5").addEventListener('click', function () {selectCard(5)});
-    document.getElementById("playerCard6").addEventListener('click', function () {selectCard(6)});
-    document.getElementById("playerCard7").addEventListener('click', function () {selectCard(7)});
-    document.getElementById("playerCard8").addEventListener('click', function () {selectCard(8)});
-    document.getElementById("playerCard9").addEventListener('click', function () {selectCard(9)});
-    document.getElementById("playerCard10").addEventListener('click', function () {selectCard(10)});
-    document.getElementById("playerCard11").addEventListener('click', function () {selectCard(11)});
-    document.getElementById("playerCard12").addEventListener('click', function () {selectCard(12)});
-    document.getElementById("PlayerBidSubmit").addEventListener('click', function () {submitBid()});
+    document.getElementById("playerCard0").addEventListener('click', function () { selectCard(0) });
+    document.getElementById("playerCard1").addEventListener('click', function () { selectCard(1) });
+    document.getElementById("playerCard2").addEventListener('click', function () { selectCard(2) });
+    document.getElementById("playerCard3").addEventListener('click', function () { selectCard(3) });
+    document.getElementById("playerCard4").addEventListener('click', function () { selectCard(4) });
+    document.getElementById("playerCard5").addEventListener('click', function () { selectCard(5) });
+    document.getElementById("playerCard6").addEventListener('click', function () { selectCard(6) });
+    document.getElementById("playerCard7").addEventListener('click', function () { selectCard(7) });
+    document.getElementById("playerCard8").addEventListener('click', function () { selectCard(8) });
+    document.getElementById("playerCard9").addEventListener('click', function () { selectCard(9) });
+    document.getElementById("playerCard10").addEventListener('click', function () { selectCard(10) });
+    document.getElementById("playerCard11").addEventListener('click', function () { selectCard(11) });
+    document.getElementById("playerCard12").addEventListener('click', function () { selectCard(12) });
+    document.getElementById("PlayerBidSubmit").addEventListener('click', function () { submitBid() });
 
     // Main game:
     startGame();
