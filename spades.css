@@ -18,13 +18,20 @@
 }
 
 .data-text {
+    text-align: center;
     font-size: 18px;
+}
+
+#GameContainer {
+    margin: 0 auto;
 }
 
 #PlayArea {
     width: 320px;
     text-align: center;
     margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #WestAndEastCardContainer {
@@ -37,7 +44,8 @@
 }
 
 #Player1Card {
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #Player1Tricks {
@@ -55,7 +63,8 @@
 
 #Player2Card {
     display: block;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #Player2Tricks {
@@ -71,7 +80,8 @@
 }
 
 #Player3Card {
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #Player3Tricks {
@@ -89,7 +99,8 @@
 
 #Player4Card {
     display: block;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #Player4Tricks {
@@ -100,23 +111,39 @@
     display: inline-block;
 }
 
+#PlayerCardsContainer {
+    width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+}
+
 #PlayerBidContainer {
+    width: 200px;
     height: 50px;
     line-height: 50px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #BidLabel {
-    display: inline-block;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #PlayerBidInput {
-    display: inline-block;
-    vertical-align: middle;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
     padding: 10px;
+    margin-bottom: 10px;
 }
 
 #PlayerBidSubmit {
-    display: inline-block;
-    vertical-align: middle;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
     padding: 10px;
 }

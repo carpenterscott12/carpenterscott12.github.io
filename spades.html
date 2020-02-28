@@ -238,13 +238,17 @@
     }
 
     class Player {
-        constructor(name, isHuman, playAreaDivId) {
+        constructor(name, isHuman, playerPrefix) {
             this._name = name;
             this._isHuman = isHuman;
             this._cards = [[], [], [], []]; // One empty array per suit
             this._bid = null;
             this._tricksTaken = 0;
-            this._playAreaDiv = new HtmlDiv(playAreaDivId);
+            this._playAreaDiv = new HtmlDiv(playerPrefix + "Card");
+            this._dataDiv = new HtmlDiv(playerPrefix + "Data");
+            this._nameDiv = new HtmlDiv(playerPrefix + "Name");
+            this._tricksDiv = new HtmlDiv(playerPrefix + "Tricks");
+            this._bidDiv = new HtmlDiv(playerPrefix + "Bid");
         }
 
         addToHand(card) {
@@ -735,10 +739,10 @@
     function startGame() {
         // The Deck constructor should shuffle the cards, so no need to do it again here.
         deck = new Deck();
-        player1 = new Player("Player1", true, "Player1Card");
-        player2 = new Player("COM2", false, "Player2Card");
-        player3 = new Player("COM3", false, "Player3Card");
-        player4 = new Player("COM4", false, "Player4Card");
+        player1 = new Player("Player1", true, "Player1");
+        player2 = new Player("COM2", false, "Player2");
+        player3 = new Player("COM3", false, "Player3");
+        player4 = new Player("COM4", false, "Player4");
         players.push(player1);
         players.push(player2);
         players.push(player3);
