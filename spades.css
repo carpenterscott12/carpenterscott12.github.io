@@ -17,6 +17,89 @@
     vertical-align: middle;
 }
 
+.data-text {
+    font-size: 18px;
+}
+
+#PlayArea {
+    width: 320px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#WestAndEastCardContainer {
+    display: inline-block;
+    width: inherit;
+}
+
+#Player1Data {
+    margin: 0 auto;
+}
+
+#Player1Card {
+    margin: 0 auto;
+}
+
+#Player1Tricks {
+    display: inline-block;
+}
+
+#Player1Bid {
+    display: inline-block;
+}
+
+#Player2Data {
+    margin: 0 auto;
+    float:left;
+}
+
+#Player2Card {
+    display: block;
+    margin: 0 auto;
+}
+
+#Player2Tricks {
+    display: inline-block;
+}
+
+#Player2Bid {
+    display: inline-block;
+}
+
+#Player3Data {
+    margin: 0 auto;
+}
+
+#Player3Card {
+    margin: 0 auto;
+}
+
+#Player3Tricks {
+    display: inline-block;
+}
+
+#Player3Bid {
+    display: inline-block;
+}
+
+#Player4Data {
+    margin: 0 auto;
+    float: right;
+}
+
+#Player4Card {
+    display: block;
+    margin: 0 auto;
+}
+
+#Player4Tricks {
+    display: inline-block;
+}
+
+#Player4Bid {
+    display: inline-block;
+}
+
 #PlayerBidContainer {
     height: 50px;
     line-height: 50px;
