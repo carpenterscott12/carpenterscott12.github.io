@@ -13,25 +13,32 @@
             <div id="Player3Data">
                 <div id="Player3Card" class="play-area-card"></div>
                 <div id="Player3Name" class="data-text">COM3</div>
-                <div id="Player3TricksToBids" class="data-text"><div id="Player3Tricks" class="data-text">0</div>/<div id="Player3Bid" class="data-text">2</div></div>
+                <div id="Player3TricksToBids" class="data-text">
+                    <div id="Player3Tricks" class="data-text">0</div>/<div id="Player3Bid" class="data-text">2</div>
+                </div>
             </div>
-            
             <div id="WestAndEastCardContainer">
                 <div id="Player2Data">
                     <div id="Player2Card" class="play-area-card"></div>
                     <div id="Player2Name" class="data-text">COM2</div>
-                    <div id="Player2TricksToBids" class="data-text"><div id="Player2Tricks" class="data-text">0</div>/<div id="Player2Bid" class="data-text">2</div></div>
+                    <div id="Player2TricksToBids" class="data-text">
+                        <div id="Player2Tricks" class="data-text">0</div>/<div id="Player2Bid" class="data-text">2</div>
+                    </div>
                 </div>
                 <div id="Player4Data">
                     <div id="Player4Card" class="play-area-card"></div>
                     <div id="Player4Name" class="data-text">COM4</div>
-                    <div id="Player4TricksToBids" class="data-text"><div id="Player4Tricks" class="data-text">0</div>/<div id="Player4Bid" class="data-text">2</div></div>
+                    <div id="Player4TricksToBids" class="data-text">
+                        <div id="Player4Tricks" class="data-text">0</div>/<div id="Player4Bid" class="data-text">2</div>
+                    </div>
                 </div>
             </div>
             <div id="Player1Data">
                 <div id="Player1Card" class="play-area-card"></div>
                 <div id="Player1Name" class="data-text">Player1</div>
-                <div id="Player1TricksToBids" class="data-text"><div id="Player1Tricks" class="data-text">0</div>/<div id="Player1Bid" class="data-text">2</div></div>
+                <div id="Player1TricksToBids" class="data-text">
+                    <div id="Player1Tricks" class="data-text">0</div>/<div id="Player1Bid" class="data-text">2</div>
+                </div>
             </div>
         </div>
         <div id="PlayerCardsContainer">
@@ -86,6 +93,8 @@
     let highestCurrentRoundCard = null;
     let Player1CardsWithInputs = [];
     let totalRoundsPlayed = 0;
+    let Player1AndPlayer3Score = 0;
+    let Player2AndPlayer4Score = 0;
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -133,6 +142,14 @@
 
         setColorBlack() {
             this._element.style.color = "black";
+        }
+
+        setColorGreen() {
+            this._element.style.color = "#03DAC6";
+        }
+
+        setColorWhite() {
+            this._element.style.color = "#FFFFFF";
         }
     }
 
@@ -283,7 +300,16 @@
 
         incrementTricks() {
             this._tricksTaken++;
-            // Write the new tricks value to the player's info area
+            this._tricksDiv.setInnerHtml(this._tricksTaken);
+        }
+
+        removeCardFromHandIfExists(card) {
+            if (this._cards[card._suit].length > 0) {
+                let cardIndex = this._cards[card._suit].findIndex(findCard => findCard._rank === card._rank && findCard._suit === card._suit);
+                if (cardIndex > -1) {
+                    this._cards[card._suit].splice(cardIndex, 1);
+                }
+            }
         }
 
         getHandArray() {
@@ -292,6 +318,7 @@
         }
 
         playCard(card) {
+            this.removeCardFromHandIfExists(card);
             cardsPlayedThisRound++;
             if (spadesBrokenThisGame === false && card._suit === Suit.Spade) {
                 spadesBrokenThisGame = true;
@@ -334,7 +361,7 @@
                         }
                     }
                 }
-                
+
                 players[winnerIndex].incrementTricks();
                 //TODO: Indicate player's trick count vs bid count in the UI
 
@@ -346,11 +373,11 @@
 
                 totalRoundsPlayed++;
                 if (totalRoundsPlayed === 13) {
-                    // TODO: End the current game and restart with the total scores for each partnership recorded
+                    tallyCurrentRoundScore();
+                    startNewRound();
                 }
 
-                // TODO: Indicate whose turn it is through the UI
-                currentPlayerTurn = winnerIndex;
+                setCurrentPlayerTurn(winnerIndex);
                 let newRoundPlayer = players[currentPlayerTurn];
 
                 console.log(player1);
@@ -628,6 +655,7 @@
             }
             else {
                 this._bid = bidAmount;
+                this._bidDiv.setInnerHtml(this._bid);
             }
         }
 
@@ -749,7 +777,40 @@
         players.push(player4);
         dealerIndex = getRandomIntInclusive(0, 3);
 
+        dealNewHand();
+
+        Player1CardDiv = new HtmlDiv("Player1Card", "");
+        Player2CardDiv = new HtmlDiv("Player2Card", "");
+        Player3CardDiv = new HtmlDiv("Player3Card", "");
+        Player4CardDiv = new HtmlDiv("Player4Card", "");
+        PlayerBidInput = new HtmlInput("PlayerBidInput");
+        PlayerBidContainerDiv = new HtmlDiv("PlayerBidContainer");
+
+        setCurrentPlayerTurn(getNextPlayer(dealerIndex));
+        initiateBidding();
+    }
+
+    function nextTurn() {
+        setCurrentPlayerTurn(getNextPlayer(currentPlayerTurn));
+    }
+
+    function getNextPlayer(playerIndex) {
+        var newIndex = playerIndex + 1;
+        if (newIndex > 3) {
+            newIndex = 0;
+        }
+        return newIndex;
+    }
+
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function dealNewHand() {
         // It's not important to deal each card to every player in sequence since we know the cards in the deck are already random.
+        deck = new Deck();
         player1.drawFullHand();
         player2.drawFullHand();
         player3.drawFullHand();
@@ -769,15 +830,9 @@
             }
             Player1CardsWithInputs.push(new CardWithHtmlInput(currentCard, htmlInput));
         }
+    }
 
-        Player1CardDiv = new HtmlDiv("Player1Card", "");
-        Player2CardDiv = new HtmlDiv("Player2Card", "");
-        Player3CardDiv = new HtmlDiv("Player3Card", "");
-        Player4CardDiv = new HtmlDiv("Player4Card", "");
-        PlayerBidInput = new HtmlInput("PlayerBidInput");
-        PlayerBidContainerDiv = new HtmlDiv("PlayerBidContainer");
-
-        currentPlayerTurn = getNextPlayer(dealerIndex);
+    function initiateBidding() {
         for (i = 0; i < 4; i++) {
             if (players[currentPlayerTurn]._isHuman) {
                 break;
@@ -788,32 +843,6 @@
             currentBidCount++;
             nextTurn();
         }
-    }
-
-    function nextTurn() {
-        currentPlayerTurn = getNextPlayer(currentPlayerTurn);
-    }
-
-    function getNextPlayer(playerIndex) {
-        var newIndex = playerIndex + 1;
-        if (newIndex > 3) {
-            newIndex = 0;
-        }
-        return newIndex;
-    }
-
-    function getRandomIntInclusive(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function dealNewHand() {
-        deck = new Deck();
-        player1.drawFullHand();
-        player2.drawFullHand();
-        player3.drawFullHand();
-        player4.drawFullHand();
     }
 
     function submitBid() {
@@ -841,7 +870,6 @@
             if (currentPlayer._isHuman === false) {
                 currentPlayer.playCard(currentPlayer.findCardToPlay());
             }
-
         }
         else {
             console.log("Bad bid amount");
@@ -850,13 +878,68 @@
 
     function selectCard(cardId) {
         // If bidding is still active, don't allow cards to be played
-        if (currentBidCount < 4) {
+        if (currentPlayerTurn != 0 || currentBidCount < 4) {
             return;
+        }
+        let selectedCard = Player1CardsWithInputs[cardId]._card;
+        if (selectedCard._suit === Suit.Spade && spadesBrokenThisGame === false) {
+            alert("Spades have not been broken this game!");
+            return;
+        }
+        if (currentRoundSuit !== null && selectedCard._suit !== currentRoundSuit) {
+            if (player1._cards[selectedCard._suit].length > 0) {
+                alert("You must follow suit!");
+                return;
+            }
         }
         if (Player1CardsWithInputs !== null && Player1CardsWithInputs.length > cardId) {
             Player1CardsWithInputs[cardId]._htmlInput.hide();
             player1.playCard(Player1CardsWithInputs[cardId]._card);
         }
+    }
+
+    function tallyCurrentRoundScore() {
+            if (player1._bid > player1._tricksTaken) {
+                Player1AndPlayer3Score -= player1._bid * 10;
+            }
+            if (player1._bid <= player1._tricksTaken) {
+                Player1AndPlayer3Score += player1._bid * 10;
+            }
+            if (player1.bid < player1._tricksTaken) {
+                Player1AndPlayer3Score += player1._tricksTaken - player1._bid;
+            }
+
+            if (player3._bid > player3._tricksTaken) {
+                Player1AndPlayer3Score -= player3._bid * 10;
+            }
+            if (player3._bid <= player3._tricksTaken) {
+                Player1AndPlayer3Score += player3._bid * 10;
+            }
+            if (player3.bid < player3._tricksTaken) {
+                Player1AndPlayer3Score += player3._tricksTaken - player3._bid;
+            }
+
+            if (player2._bid > player2._tricksTaken) {
+                Player2AndPlayer4Score -= player2._bid * 10;
+            }
+            if (player2._bid <= player2._tricksTaken) {
+                Player2AndPlayer4Score += player2._bid * 10;
+            }
+            if (player2.bid < player2._tricksTaken) {
+                Player2AndPlayer4Score += player2._tricksTaken - player2._bid;
+            }
+
+            if (player4._bid > player4._tricksTaken) {
+                Player2AndPlayer4Score -= player4._bid * 10;
+            }
+            if (player4._bid <= player4._tricksTaken) {
+                Player2AndPlayer4Score += player4._bid * 10;
+            }
+            if (player4.bid < player4._tricksTaken) {
+                Player2AndPlayer4Score += player4._tricksTaken - player4._bid;
+            }
+
+            alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and P2 and COM4: " + Player2AndPlayer4Score);
     }
 
     function clearPlayAreaCards() {
@@ -866,8 +949,28 @@
         Player4CardDiv.setInnerHtml('');
     }
 
+    function setCurrentPlayerTurn(playerIndex) {
+        players[0]._nameDiv.setColorWhite();
+        players[1]._nameDiv.setColorWhite();
+        players[2]._nameDiv.setColorWhite();
+        players[3]._nameDiv.setColorWhite();
+        currentPlayerTurn = playerIndex;
+        players[playerIndex]._nameDiv.setColorGreen();
+    }
+
+    function startNewRound() {
+        dealNewHand();
+        dealerIndex = getNextPlayer(dealerIndex);
+        setCurrentPlayerTurn(getNextPlayer(dealerIndex));
+        initiateBidding();
+    }
+
     function resetGame() {
 
+    }
+
+    function sleep(milliseconds) {
+        return new Promise
     }
 
     document.getElementById("playerCard0").addEventListener('click', function () { selectCard(0) });
