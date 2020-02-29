@@ -14,7 +14,7 @@
                 <div id="Player3Card" class="play-area-card"></div>
                 <div id="Player3Name" class="data-text">COM3</div>
                 <div id="Player3TricksToBids" class="data-text">
-                    <div id="Player3Tricks" class="data-text">0</div>/<div id="Player3Bid" class="data-text">2</div>
+                    <div id="Player3Tricks" class="data-text">-</div>/<div id="Player3Bid" class="data-text">-</div>
                 </div>
             </div>
             <div id="WestAndEastCardContainer">
@@ -22,14 +22,14 @@
                     <div id="Player2Card" class="play-area-card"></div>
                     <div id="Player2Name" class="data-text">COM2</div>
                     <div id="Player2TricksToBids" class="data-text">
-                        <div id="Player2Tricks" class="data-text">0</div>/<div id="Player2Bid" class="data-text">2</div>
+                        <div id="Player2Tricks" class="data-text">-</div>/<div id="Player2Bid" class="data-text">-</div>
                     </div>
                 </div>
                 <div id="Player4Data">
                     <div id="Player4Card" class="play-area-card"></div>
                     <div id="Player4Name" class="data-text">COM4</div>
                     <div id="Player4TricksToBids" class="data-text">
-                        <div id="Player4Tricks" class="data-text">0</div>/<div id="Player4Bid" class="data-text">2</div>
+                        <div id="Player4Tricks" class="data-text">-</div>/<div id="Player4Bid" class="data-text">-</div>
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                 <div id="Player1Card" class="play-area-card"></div>
                 <div id="Player1Name" class="data-text">Player1</div>
                 <div id="Player1TricksToBids" class="data-text">
-                    <div id="Player1Tricks" class="data-text">0</div>/<div id="Player1Bid" class="data-text">2</div>
+                    <div id="Player1Tricks" class="data-text">-</div>/<div id="Player1Bid" class="data-text">-</div>
                 </div>
             </div>
         </div>
@@ -264,6 +264,7 @@
             this._playAreaDiv = new HtmlDiv(playerPrefix + "Card");
             this._dataDiv = new HtmlDiv(playerPrefix + "Data");
             this._nameDiv = new HtmlDiv(playerPrefix + "Name");
+            this._tricksToBidsDiv = new HtmlDiv(playerPrefix + "TricksToBids");
             this._tricksDiv = new HtmlDiv(playerPrefix + "Tricks");
             this._bidDiv = new HtmlDiv(playerPrefix + "Bid");
         }
@@ -317,7 +318,7 @@
             return this._handArray;
         }
 
-        playCard(card) {
+        async playCard(card) {
             this.removeCardFromHandIfExists(card);
             cardsPlayedThisRound++;
             if (spadesBrokenThisGame === false && card._suit === Suit.Spade) {
@@ -326,7 +327,6 @@
             currentPlayedCards[currentPlayerTurn] = card;
 
             console.log("Player " + this._name + " played: " + card.getString());
-
             this.updatePlayArea(card);
 
             if (cardsPlayedThisRound === 4) {
@@ -368,6 +368,7 @@
                 currentPlayedCards = [null, null, null, null];
                 highestCurrentRoundCard = null;
                 currentRoundSuit = null;
+                await sleep(2500);
                 clearPlayAreaCards();
 
 
@@ -389,7 +390,8 @@
                     if (newRoundPlayer._cards[1].length === 0) {
                         console.log("Hearts suit has zero cards.");
                     }
-                    newRoundPlayer.playCard(newRoundPlayer.findCardToPlay());
+                    await sleep(1000);
+                    await newRoundPlayer.playCard(newRoundPlayer.findCardToPlay());
                     return;
                 }
                 else {
@@ -418,7 +420,8 @@
             nextTurn();
             let nextPlayer = players[currentPlayerTurn];
             if (nextPlayer._isHuman === false) {
-                nextPlayer.playCard(nextPlayer.findCardToPlay());
+                await sleep(1000);
+                await nextPlayer.playCard(nextPlayer.findCardToPlay());
             }
             return;
         }
@@ -656,6 +659,7 @@
             else {
                 this._bid = bidAmount;
                 this._bidDiv.setInnerHtml(this._bid);
+                this._tricksToBidsDiv.showBlock();
             }
         }
 
@@ -845,7 +849,7 @@
         }
     }
 
-    function submitBid() {
+    async function submitBid() {
         let playerBidValue = parseInt(PlayerBidInput.getValue(), 10);
         if (playerBidValue > -1 && playerBidValue < 14) {
             player1.setBid(playerBidValue);
@@ -868,7 +872,7 @@
 
             let currentPlayer = players[currentPlayerTurn];
             if (currentPlayer._isHuman === false) {
-                currentPlayer.playCard(currentPlayer.findCardToPlay());
+                await currentPlayer.playCard(currentPlayer.findCardToPlay());
             }
         }
         else {
@@ -876,13 +880,13 @@
         }
     }
 
-    function selectCard(cardId) {
+    async function selectCard(cardId) {
         // If bidding is still active, don't allow cards to be played
         if (currentPlayerTurn != 0 || currentBidCount < 4) {
             return;
         }
         let selectedCard = Player1CardsWithInputs[cardId]._card;
-        if (selectedCard._suit === Suit.Spade && spadesBrokenThisGame === false) {
+        if (currentROundSuit === null && selectedCard._suit === Suit.Spade && spadesBrokenThisGame === false) {
             alert("Spades have not been broken this game!");
             return;
         }
@@ -894,7 +898,7 @@
         }
         if (Player1CardsWithInputs !== null && Player1CardsWithInputs.length > cardId) {
             Player1CardsWithInputs[cardId]._htmlInput.hide();
-            player1.playCard(Player1CardsWithInputs[cardId]._card);
+            await player1.playCard(Player1CardsWithInputs[cardId]._card);
         }
     }
 
@@ -1010,7 +1014,7 @@
     }
 
     function sleep(milliseconds) {
-        return new Promise
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
 
     document.getElementById("playerCard0").addEventListener('click', function () { selectCard(0) });

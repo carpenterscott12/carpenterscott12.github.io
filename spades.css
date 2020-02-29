@@ -52,6 +52,10 @@
     margin-right: auto;
 }
 
+#Player1TricksToBids {
+    display: hidden;
+}
+
 #Player1Tricks {
     display: inline-block;
 }
@@ -71,6 +75,10 @@
     margin-right: auto;
 }
 
+#Player2TricksToBids {
+    display: hidden;
+}
+
 #Player2Tricks {
     display: inline-block;
 }
@@ -86,6 +94,10 @@
 #Player3Card {
     margin-left: auto;
     margin-right: auto;
+}
+
+#Player3TricksToBids {
+    display: hidden;
 }
 
 #Player3Tricks {
@@ -105,6 +117,10 @@
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+#Player4TricksToBids {
+    display: hidden;
 }
 
 #Player4Tricks {
