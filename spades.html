@@ -887,7 +887,7 @@
             return;
         }
         if (currentRoundSuit !== null && selectedCard._suit !== currentRoundSuit) {
-            if (player1._cards[selectedCard._suit].length > 0) {
+            if (player1._cards[currentRoundSuit].length > 0) {
                 alert("You must follow suit!");
                 return;
             }
@@ -899,6 +899,15 @@
     }
 
     function tallyCurrentRoundScore() {
+        if (player1._bid === 0) {
+            if (player1._bid === player1._tricksTaken) {
+                Player1AndPlayer3Score += 100;
+            }
+            else {
+                Player1AndPlayer3Score -= 100;
+            }
+        }
+        else {
             if (player1._bid > player1._tricksTaken) {
                 Player1AndPlayer3Score -= player1._bid * 10;
             }
@@ -908,7 +917,17 @@
             if (player1.bid < player1._tricksTaken) {
                 Player1AndPlayer3Score += player1._tricksTaken - player1._bid;
             }
+        }
 
+        if (player3._bid === 0) {
+            if (player3._bid === player3._tricksTaken) {
+                Player1AndPlayer3Score += 100;
+            }
+            else {
+                Player1AndPlayer3Score -= 100;
+            }
+        }
+        else {
             if (player3._bid > player3._tricksTaken) {
                 Player1AndPlayer3Score -= player3._bid * 10;
             }
@@ -918,7 +937,17 @@
             if (player3.bid < player3._tricksTaken) {
                 Player1AndPlayer3Score += player3._tricksTaken - player3._bid;
             }
+        }
 
+        if (player2._bid === 0) {
+            if (player2._bid === player2._tricksTaken) {
+                Player2AndPlayer4Score += 100;
+            }
+            else {
+                Player2AndPlayer4Score -= 100;
+            }
+        }
+        else {
             if (player2._bid > player2._tricksTaken) {
                 Player2AndPlayer4Score -= player2._bid * 10;
             }
@@ -928,7 +957,17 @@
             if (player2.bid < player2._tricksTaken) {
                 Player2AndPlayer4Score += player2._tricksTaken - player2._bid;
             }
+        }
 
+        if (player4._bid === 0) {
+            if (player4._bid === player4._tricksTaken) {
+                Player2AndPlayer4Score += 100;
+            }
+            else {
+                Player2AndPlayer4Score -= 100;
+            }
+        }
+        else {
             if (player4._bid > player4._tricksTaken) {
                 Player2AndPlayer4Score -= player4._bid * 10;
             }
@@ -938,8 +977,9 @@
             if (player4.bid < player4._tricksTaken) {
                 Player2AndPlayer4Score += player4._tricksTaken - player4._bid;
             }
+        }
 
-            alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and P2 and COM4: " + Player2AndPlayer4Score);
+        alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and P2 and COM4: " + Player2AndPlayer4Score);
     }
 
     function clearPlayAreaCards() {
