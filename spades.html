@@ -10,8 +10,14 @@
 
     <div id="GameContainer">
         <div id="ScoreArea">
-            <div id="Team1NameAndScore"><div id="Team1Name">Team 1 (Player1 and COM3)</div><div id="Team1Score">0</div></div>
-            <div id="Team2NameAndScore"><div id="Team2Name">Team 2 (COM2 and COM4)</div><div id="Team2Score">0</div></div>
+            <div id="Team1NameAndScore">
+                <div id="Team1Name">Team 1 (Player1 and COM3)</div>
+                <div id="Team1Score">0</div>
+            </div>
+            <div id="Team2NameAndScore">
+                <div id="Team2Name">Team 2 (COM2 and COM4)</div>
+                <div id="Team2Score">0</div>
+            </div>
         </div>
         <div id="PlayArea">
             <div id="Player3Data">
@@ -453,76 +459,26 @@
         }
 
         findCardToPlay() {
-            // TODO: Remember to handle nil bid
-            if (cardsPlayedThisRound === 0) {
-                // Just pick a valid card
-                if (spadesBrokenThisGame) {
-                    // Consider spades as a lead suit
-                    let nonSpadeAce = this.getNonSpadeAce();
-                    if (nonSpadeAce !== null) {
-                        return nonSpadeAce;
+            if (this._bid === 0) {
+                if (cardsPlayedThisRound === 0) {
+                    let lowestSpade = this.getLowestSpade();
+                    if (lowestSpade !== null) {
+                        return lowestSpade;
                     }
-                    let highestSpade = this.getHighestAvailableSpade();
-                    if (highestSpade !== null) {
-                        return highestSpade;
+                    let lowestCardAvailable = this.getLowestAvailableCard();
+                    if (lowestCardAvailable !== null) {
+                        return lowestCardAvailable;
                     }
                     else {
-                        let lowestSpade = this.getLowestSpade();
-                        if (lowestSpade !== null) {
-                            return lowestSpade;
-                        }
-                        let lowestCardAvailable = this.getLowestAvailableCard();
-                        if (lowestCardAvailable !== null) {
-                            return lowestCardAvailable;
-                        }
-                        else {
-                            console.log("Error: Lowest card available was null.");
-                        }
+                        console.log("Error: Lowest card available was null.");
                     }
                 }
                 else {
-                    // Only consider hearts, clubs, and diamonds as lead suits
-                    let highestNonSpade = this.getHighestAvailableCardNoSpades();
-                    if (highestNonSpade !== null) {
-                        return highestNonSpade;
-                    }
-                    let lowest = this.getLowestAvailableCardNotASpade();
-                    if (lowest !== null) {
-                        return lowest;
-                    }
-                    else {
-                        let lowestSpade = this.getLowestSpade();
-                        if (lowestSpade !== null) {
-                            return lowestSpade;
-                        }
-                        else {
-                            console.log("Error: Lowest spade was null.");
-                        }
-                    }
-                }
-            }
-            else {
-                // Follow suit if possible and play a card that will either win or minimize loss in value
-                if (this._cards[currentRoundSuit].length > 0) {
-                    let followSuitCard = this.getCardThatBeatsOrGoesLow();
-                    if (followSuitCard !== null) {
-                        return followSuitCard;
-                    }
-                    else {
-                        if (this._tricksTaken < this._bid) {
-                            let lowestSpade = this.getLowestSpade();
-                            if (lowestSpade !== null) {
-                                return lowestSpade;
-                            }
-                            else {
-                                let lowestAvailable = this.getLowestAvailableCard();
-                                if (lowestAvailable !== null) {
-                                    return lowestAvailable;
-                                }
-                                else {
-                                    console.log("Error: This lowest available was null.");
-                                }
-                            }
+                    // Follow suit if possible and play a card that will either win or minimize loss in value
+                    if (this._cards[currentRoundSuit].length > 0) {
+                        let followSuitCard = this.getLowestOfSuit(currentRoundSuit);
+                        if (followSuitCard !== null) {
+                            return followSuitCard;
                         }
                         else {
                             let lowestCard = this.getLowestAvailableCard();
@@ -534,35 +490,132 @@
                             }
                         }
                     }
-                }
-                else {
-                    // You can either play a spade or throw off a bad card from another suit
-                    if (this._tricksTaken < this._bid) {
-                        let lowestSpade = this.getLowestSpade();
-                        if (lowestSpade !== null) {
-                            return lowestSpade;
-                        }
-                        else {
-                            let lowestAvailableCard = this.getLowestAvailableCard();
-                            if (lowestAvailableCard !== null) {
-                                return lowestAvailableCard;
+                    else {
+                        // You can either play a spade or throw off a bad card from another suit
+                        if (this._tricksTaken < this._bid) {
+                            let lowestSpade = this.getLowestSpade();
+                            if (lowestSpade !== null) {
+                                return lowestSpade;
                             }
                             else {
-                                console.log("Error: That lowest available card was null.");
+                                let lowestAvailableCard = this.getLowestAvailableCard();
+                                if (lowestAvailableCard !== null) {
+                                    return lowestAvailableCard;
+                                }
+                                else {
+                                    console.log("Error: That lowest available card was null.");
+                                }
                             }
                         }
-                    }
-                    else {
-                        let lowestAvailCard = this.getLowestAvailableCard();
-                        if (lowestAvailCard !== null) {
-                            return lowestAvailCard;
-                        }
                         else {
-                            console.log("Error: The lowest avail card was null.");
+                            let lowestAvailCard = this.getLowestAvailableCard();
+                            if (lowestAvailCard !== null) {
+                                return lowestAvailCard;
+                            }
+                            else {
+                                console.log("Error: The lowest avail card was null.");
+                            }
                         }
                     }
                 }
             }
+            else {
+                if (cardsPlayedThisRound === 0) {
+                    // Just pick a valid card
+                    if (spadesBrokenThisGame) {
+                        // Consider spades as a lead suit
+                        let nonSpadeAce = this.getNonSpadeAce();
+                        if (nonSpadeAce !== null) {
+                            return nonSpadeAce;
+                        }
+                        let highestSpade = this.getHighestAvailableSpade();
+                        if (highestSpade !== null) {
+                            return highestSpade;
+                        }
+                        else {
+                            let lowestSpade = this.getLowestSpade();
+                            if (lowestSpade !== null) {
+                                return lowestSpade;
+                            }
+                            let lowestCardAvailable = this.getLowestAvailableCard();
+                            if (lowestCardAvailable !== null) {
+                                return lowestCardAvailable;
+                            }
+                            else {
+                                console.log("Error: Lowest card available was null.");
+                            }
+                        }
+                    }
+                    else {
+                        // Only consider hearts, clubs, and diamonds as lead suits
+                        let highestNonSpade = this.getHighestAvailableCardNoSpades();
+                        if (highestNonSpade !== null) {
+                            return highestNonSpade;
+                        }
+                        let lowest = this.getLowestAvailableCardNotASpade();
+                        if (lowest !== null) {
+                            return lowest;
+                        }
+                        else {
+                            let lowestSpade = this.getLowestSpade();
+                            if (lowestSpade !== null) {
+                                return lowestSpade;
+                            }
+                            else {
+                                console.log("Error: Lowest spade was null.");
+                            }
+                        }
+                    }
+                }
+                else {
+                    // Follow suit if possible and play a card that will either win or minimize loss in value
+                    if (this._cards[currentRoundSuit].length > 0) {
+                        let followSuitCard = this.getCardThatBeatsOrGoesLow();
+                        if (followSuitCard !== null) {
+                            return followSuitCard;
+                        }
+                        else {
+                            if (this._tricksTaken < this._bid) {
+                                let lowestSpade = this.getLowestSpade();
+                                if (lowestSpade !== null) {
+                                    return lowestSpade;
+                                }
+                                else {
+                                    let lowestAvailable = this.getLowestAvailableCard();
+                                    if (lowestAvailable !== null) {
+                                        return lowestAvailable;
+                                    }
+                                    else {
+                                        console.log("Error: This lowest available was null.");
+                                    }
+                                }
+                            }
+                            else {
+                                let lowestCard = this.getLowestAvailableCard();
+                                if (lowestCard !== null) {
+                                    return lowestCard;
+                                }
+                                else {
+                                    console.log("Error: The lowest available card was null.");
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        let lowestNonSpade = this.getLowestAvailableCard();
+                        if (lowestNonSpade !== null) {
+                            return lowestNonSpade;
+                        }
+                        else {
+                            return this.getLowestSpade();
+                        }
+                    }
+                }
+            }
+
+
+
+
         }
 
         getNonSpadeAce() {
@@ -635,6 +688,15 @@
         getLowestSpade() {
             if (this._cards[0].length > 0) {
                 return this._cards[0].shift();
+            }
+            else {
+                return null;
+            }
+        }
+
+        getLowestOfSuit(suit) {
+            if (this._cards[suit].length > 0) {
+                return this._cards[suit].shift();
             }
             else {
                 return null;
@@ -1040,7 +1102,7 @@
         currentRoundSuit = null;
         PlayerBidInput.setValue("");
         PlayerBidContainerDiv.showBlock();
-        let i = 0; 
+        let i = 0;
         for (i = 0; i < players.length; i++) {
             players[i].resetBidAndTricks();
         }
