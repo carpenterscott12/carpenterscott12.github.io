@@ -1036,6 +1036,8 @@
         cardsPlayedThisRound = 0;
         highestCurrentRoundCard = null;
         totalHandsPlayed = 0;
+        PlayerBidInput.setValue("");
+        PlayerBidContainerDiv.showBlock();
         let i = 0; 
         for (i = 0; i < players.length; i++) {
             players[i].resetBidAndTricks();
