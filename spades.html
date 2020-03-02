@@ -9,6 +9,10 @@
 <body>
 
     <div id="GameContainer">
+        <div id="ScoreArea">
+            <div id="Team1NameAndScore"><div id="Team1Name">Team 1 (Player1 and COM3)</div><div id="Team1Score">0</div></div>
+            <div id="Team2NameAndScore"><div id="Team2Name">Team 2 (COM2 and COM4)</div><div id="Team2Score">0</div></div>
+        </div>
         <div id="PlayArea">
             <div id="Player3Data">
                 <div id="Player3Card" class="play-area-card"></div>
@@ -82,6 +86,8 @@
     let Player4CardDiv = null;
     let PlayerBidInput = null;
     let PlayerBidContainerDiv = null;
+    let Team1ScoreDiv = null;
+    let Team2ScoreDiv = null;
     let dealerIndex = null;
     let players = [];
     let currentBidCount = 0; // Once this is higher than 3, bidding is no longer active
@@ -92,12 +98,11 @@
     let currentRoundSuit = null;
     let highestCurrentRoundCard = null;
     let Player1CardsWithInputs = [];
-    let totalRoundsPlayed = 0;
+    let totalHandsPlayed = 0;
     let Player1AndPlayer3Score = 0;
     let Player2AndPlayer4Score = 0;
     let Player1AndPlayer3Sandbags = 0;
     let Player2AndPlayer4Sandbags = 0;
-    let playerCardInputs = [];
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -403,8 +408,8 @@
                 clearPlayAreaCards();
 
 
-                totalRoundsPlayed++;
-                if (totalRoundsPlayed === 13) {
+                totalHandsPlayed++;
+                if (totalHandsPlayed === 13) {
                     tallyCurrentRoundScore();
                     startNewRound();
                 }
@@ -802,11 +807,8 @@
         Player4CardDiv = new HtmlDiv("Player4Card", "");
         PlayerBidInput = new HtmlInput("PlayerBidInput");
         PlayerBidContainerDiv = new HtmlDiv("PlayerBidContainer");
-        let i = 0;
-        for (i = 0; i < 13; i++) {
-            let cardHtmlDiv = new HtmlDiv("playerCard" + i, "");
-            playerCardInputs.push(cardHtmlDiv);
-        }
+        Team1ScoreDiv = new HtmlDiv("Team1Score");
+        Team2ScoreDiv = new HtmlDiv("Team2Score");
 
         setCurrentPlayerTurn(getNextPlayer(dealerIndex));
         initiateBidding();
@@ -998,6 +1000,9 @@
             Player2AndPlayer4Score += sandbags;
         }
 
+        Team1ScoreDiv.setInnerHtml(Player1AndPlayer3Score);
+        Team2ScoreDiv.setInnerHtml(Player2AndPlayer4Score);
+
         alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and P2 and COM4: " + Player2AndPlayer4Score);
     }
 
@@ -1018,6 +1023,11 @@
     }
 
     function startNewRound() {
+        spadesBrokenThisGame = false;
+        currentPlayedCards = [null, null, null, null];
+        cardsPlayedThisRound = 0;
+        highestCurrentRoundCard = null;
+        totalHandsPlayed = 0;
         dealNewHand();
         dealerIndex = getNextPlayer(dealerIndex);
         setCurrentPlayerTurn(getNextPlayer(dealerIndex));

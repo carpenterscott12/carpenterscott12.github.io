@@ -30,6 +30,15 @@
     margin: 0 auto;
 }
 
+#ScoreArea {
+    width: 320px;
+    text-align: center;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 20px;
+}
+
 #PlayArea {
     width: 320px;
     text-align: center;
