@@ -95,6 +95,8 @@
     let totalRoundsPlayed = 0;
     let Player1AndPlayer3Score = 0;
     let Player2AndPlayer4Score = 0;
+    let Player1AndPlayer3Sandbags = 0;
+    let Player2AndPlayer4Sandbags = 0;
     let playerCardInputs = [];
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
@@ -331,37 +333,64 @@
             console.log("Player " + this._name + " played: " + card.getString());
             this.updatePlayArea(card);
 
+            if (highestCurrentRoundCard !== null) {
+                if (card._suit === Suit.Spade) {
+                    if (highestCurrentRoundCard._suit !== Suit.Spade) {
+                        highestCurrentRoundCard = card;
+                    }
+                    else {
+                        if (card._rank > highestCurrentRoundCard._rank) {
+                            highestCurrentRoundCard = card;
+                        }
+                    }
+                }
+                else {
+                    if (card._suit === currentRoundSuit) {
+                        if (card._rank > highestCurrentRoundCard._rank && highestCurrentRoundCard._suit !== Suit.Spade) {
+                            highestCurrentRoundCard = card;
+                        }
+                    }
+                }
+            }
+            else {
+                highestCurrentRoundCard = card;
+                currentRoundSuit = card._suit;
+            }
+
             if (cardsPlayedThisRound === 4) {
                 // Set score and reset round state
                 cardsPlayedThisRound = 0;
                 let winnerIndex = null;
                 let i = 0;
                 for (i = 0; i < currentPlayedCards.length; i++) {
-                    if (winnerIndex === null) {
+                    if (highestCurrentRoundCard._suit === currentPlayedCards[i]._suit && highestCurrentRoundCard._rank === currentPlayedCards[i]._rank) {
                         winnerIndex = i;
                     }
-                    else {
-                        let currentCard = currentPlayedCards[i];
-                        let winnerCard = currentPlayedCards[winnerIndex];
-                        // If suits are the same, take the higher rank.
-                        if (currentCard._suit === winnerCard._suit) {
-                            if (currentCard._rank > winnerCard._rank) {
-                                winnerIndex = i;
-                            }
-                        }
-                        else if (currentCard._suit === Suit.Spade) {
-                            // If suit is spade, this wins because the current winner is not a spade.
-                            winnerIndex = i;
-                        }
-                        else if (currentCard._suit === currentRoundSuit) {
-                            // If the suit is the current round's suit to follow, this wins because the current winner is neither a spade nor the suit to follow.
-                            winnerIndex = i;
-                        }
-                        else {
-                            // This case means neither this card nor the current winner are the current suit to follow or spades, so it doesn't matter if I set winnerIndex to i here.
-                            winnerIndex = i;
-                        }
-                    }
+                    // if (winnerIndex === null) {
+                    //     winnerIndex = i;
+                    // }
+                    // else {
+                    //     let currentCard = currentPlayedCards[i];
+                    //     let winnerCard = currentPlayedCards[winnerIndex];
+                    //     // If suits are the same, take the higher rank.
+                    //     if (currentCard._suit === winnerCard._suit) {
+                    //         if (currentCard._rank > winnerCard._rank) {
+                    //             winnerIndex = i;
+                    //         }
+                    //     }
+                    //     else if (currentCard._suit === Suit.Spade) {
+                    //         // If suit is spade, this wins because the current winner is not a spade.
+                    //         winnerIndex = i;
+                    //     }
+                    //     else if (currentCard._suit === currentRoundSuit) {
+                    //         // If the suit is the current round's suit to follow, this wins because the current winner is neither a spade nor the suit to follow.
+                    //         winnerIndex = i;
+                    //     }
+                    //     else {
+                    //         // This case means neither this card nor the current winner are the current suit to follow or spades, so it doesn't matter if I set winnerIndex to i here.
+                    //         winnerIndex = i;
+                    //     }
+                    // }
                 }
 
                 players[winnerIndex].incrementTricks();
@@ -370,7 +399,7 @@
                 currentPlayedCards = [null, null, null, null];
                 highestCurrentRoundCard = null;
                 currentRoundSuit = null;
-                await sleep(2500);
+                await sleep(1000);
                 clearPlayAreaCards();
 
 
@@ -392,7 +421,7 @@
                     if (newRoundPlayer._cards[1].length === 0) {
                         console.log("Hearts suit has zero cards.");
                     }
-                    await sleep(1000);
+                    await sleep(500);
                     await newRoundPlayer.playCard(newRoundPlayer.findCardToPlay());
                     return;
                 }
@@ -400,29 +429,11 @@
                     return;
                 }
             }
-            else {
-                if (highestCurrentRoundCard !== null) {
-                    if (card._suit === Suit.Spade && highestCurrentRoundCard._suit !== Suit.Spade) {
-                        highestCurrentRoundCard = card;
-                    }
-                    else if (highestCurrentRoundCard._suit !== Suit.Spade) {
-                        if (card._suit === highestCurrentRoundCard._suit) {
-                            if (card._rank > highestCurrentRoundCard._rank) {
-                                highestCurrentRoundCard = card;
-                            }
-                        }
-                    }
-                }
-                else {
-                    highestCurrentRoundCard = card;
-                    currentRoundSuit = card._suit;
-                }
-            }
 
             nextTurn();
             let nextPlayer = players[currentPlayerTurn];
             if (nextPlayer._isHuman === false) {
-                await sleep(1000);
+                await sleep(500);
                 await nextPlayer.playCard(nextPlayer.findCardToPlay());
             }
             return;
@@ -913,23 +924,17 @@
     }
 
     function tallyCurrentRoundScore() {
+        let player1and3Bid = player1._bid + player3._bid;
+        let player2and4Bid = player2._bid + player4._bid;
+        let player1and3Tricks = player1._tricksTaken + player3._tricksTaken;
+        let player2and4Tricks = player2._tricksTaken + player4._tricksTaken;
+
         if (player1._bid === 0) {
             if (player1._bid === player1._tricksTaken) {
                 Player1AndPlayer3Score += 100;
             }
             else {
                 Player1AndPlayer3Score -= 100;
-            }
-        }
-        else {
-            if (player1._bid > player1._tricksTaken) {
-                Player1AndPlayer3Score -= player1._bid * 10;
-            }
-            if (player1._bid <= player1._tricksTaken) {
-                Player1AndPlayer3Score += player1._bid * 10;
-            }
-            if (player1.bid < player1._tricksTaken) {
-                Player1AndPlayer3Score += player1._tricksTaken - player1._bid;
             }
         }
 
@@ -941,16 +946,22 @@
                 Player1AndPlayer3Score -= 100;
             }
         }
-        else {
-            if (player3._bid > player3._tricksTaken) {
-                Player1AndPlayer3Score -= player3._bid * 10;
+
+        if (player1and3Bid > player1and3Tricks) {
+            Player1AndPlayer3Score -= player1and3Bid * 10;
+        }
+        if (player1and3Bid <= player1and3Tricks) {
+            Player1AndPlayer3Score += player1and3Bid * 10;
+        }
+        if (player1and3Bid < player1and3Tricks) {
+            let sandbags = (player1and3Tricks - player1and3Bid);
+            Player1AndPlayer3Sandbags += sandbags;
+            if (Player1AndPlayer3Sandbags > 10) {
+                Player1AndPlayer3Sandbags -= 10;
+                Player1AndPlayer3Score -= 100;
             }
-            if (player3._bid <= player3._tricksTaken) {
-                Player1AndPlayer3Score += player3._bid * 10;
-            }
-            if (player3.bid < player3._tricksTaken) {
-                Player1AndPlayer3Score += player3._tricksTaken - player3._bid;
-            }
+
+            Player1AndPlayer3Score += sandbags;
         }
 
         if (player2._bid === 0) {
@@ -959,17 +970,6 @@
             }
             else {
                 Player2AndPlayer4Score -= 100;
-            }
-        }
-        else {
-            if (player2._bid > player2._tricksTaken) {
-                Player2AndPlayer4Score -= player2._bid * 10;
-            }
-            if (player2._bid <= player2._tricksTaken) {
-                Player2AndPlayer4Score += player2._bid * 10;
-            }
-            if (player2.bid < player2._tricksTaken) {
-                Player2AndPlayer4Score += player2._tricksTaken - player2._bid;
             }
         }
 
@@ -981,16 +981,21 @@
                 Player2AndPlayer4Score -= 100;
             }
         }
-        else {
-            if (player4._bid > player4._tricksTaken) {
-                Player2AndPlayer4Score -= player4._bid * 10;
+
+        if (player2and4Bid > player2and4Tricks) {
+            Player2AndPlayer4Score -= player2and4Bid * 10;
+        }
+        if (player2and4Bid <= player2and4Tricks) {
+            Player2AndPlayer4Score += player2and4Bid * 10;
+        }
+        if (player2and4Bid < player2and4Tricks) {
+            let sandbags = (player2and4Tricks - player2and4Bid);
+            Player2AndPlayer4Sandbags += sandbags;
+            if (Player2AndPlayer4Sandbags > 10) {
+                Player2AndPlayer4Sandbags -= 10;
+                Player2AndPlayer4Score -= 100;
             }
-            if (player4._bid <= player4._tricksTaken) {
-                Player2AndPlayer4Score += player4._bid * 10;
-            }
-            if (player4.bid < player4._tricksTaken) {
-                Player2AndPlayer4Score += player4._tricksTaken - player4._bid;
-            }
+            Player2AndPlayer4Score += sandbags;
         }
 
         alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and P2 and COM4: " + Player2AndPlayer4Score);
