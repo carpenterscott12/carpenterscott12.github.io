@@ -313,6 +313,14 @@
             this._tricksDiv.setInnerHtml(this._tricksTaken);
         }
 
+        resetBidAndTricks() {
+            this._cards = [[], [], [], []]; // One empty array per suit
+            this._tricksTaken = 0;
+            this._bid = null;
+            this._tricksDiv.setInnerHtml("-");
+            this._bidDiv.setInnerHtml("-");
+        }
+
         removeCardFromHandIfExists(card) {
             if (this._cards[card._suit].length > 0) {
                 let cardIndex = this._cards[card._suit].findIndex(findCard => findCard._rank === card._rank && findCard._suit === card._suit);
@@ -1003,7 +1011,7 @@
         Team1ScoreDiv.setInnerHtml(Player1AndPlayer3Score);
         Team2ScoreDiv.setInnerHtml(Player2AndPlayer4Score);
 
-        alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and P2 and COM4: " + Player2AndPlayer4Score);
+        alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and COM2 and COM4: " + Player2AndPlayer4Score);
     }
 
     function clearPlayAreaCards() {
@@ -1028,6 +1036,10 @@
         cardsPlayedThisRound = 0;
         highestCurrentRoundCard = null;
         totalHandsPlayed = 0;
+        let i = 0; 
+        for (i = 0; i < players.length; i++) {
+            players[i].resetBidAndTricks();
+        }
         dealNewHand();
         dealerIndex = getNextPlayer(dealerIndex);
         setCurrentPlayerTurn(getNextPlayer(dealerIndex));
