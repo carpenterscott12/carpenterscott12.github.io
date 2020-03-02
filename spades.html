@@ -430,15 +430,11 @@
                 if (totalHandsPlayed === 13) {
                     tallyCurrentRoundScore();
                     startNewRound();
+                    return;
                 }
 
                 setCurrentPlayerTurn(winnerIndex);
                 let newRoundPlayer = players[currentPlayerTurn];
-
-                console.log(player1);
-                console.log(player2);
-                console.log(player3);
-                console.log(player4);
 
                 if (!newRoundPlayer._isHuman) {
                     if (newRoundPlayer._cards[1].length === 0) {
