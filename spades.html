@@ -95,6 +95,7 @@
     let totalRoundsPlayed = 0;
     let Player1AndPlayer3Score = 0;
     let Player2AndPlayer4Score = 0;
+    let playerCardInputs = [];
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -196,6 +197,7 @@
         constructor(card, htmlInput) {
             this._card = card;
             this._htmlInput = htmlInput;
+            this._htmlInput.showInlineBlock();
         }
     }
 
@@ -789,6 +791,11 @@
         Player4CardDiv = new HtmlDiv("Player4Card", "");
         PlayerBidInput = new HtmlInput("PlayerBidInput");
         PlayerBidContainerDiv = new HtmlDiv("PlayerBidContainer");
+        let i = 0;
+        for (i = 0; i < 13; i++) {
+            let cardHtmlDiv = new HtmlDiv("playerCard" + i, "");
+            playerCardInputs.push(cardHtmlDiv);
+        }
 
         setCurrentPlayerTurn(getNextPlayer(dealerIndex));
         initiateBidding();
@@ -819,6 +826,9 @@
         player2.drawFullHand();
         player3.drawFullHand();
         player4.drawFullHand();
+
+        // TODO: Maybe put this array initialization somewhere else to group it with other "reset" logic
+        Player1CardsWithInputs = [];
 
         let player1HandArray = player1.getHandArray();
 
