@@ -12,11 +12,13 @@
         <div id="ScoreArea">
             <div id="Team1NameAndScore">
                 <div id="Team1Name">Team 1 (Player1 and COM3)</div>
-                <div id="Team1Score">0</div>
+                <div><div class="scoreboard-text">Score:</div><div id="Team1Score" class="scoreboard-text">0</div></div>
+                <div><div class="scoreboard-text">Sandbags:</div><div id="Team1Sandbags" class="scoreboard-text">0</div></div>
             </div>
             <div id="Team2NameAndScore">
                 <div id="Team2Name">Team 2 (COM2 and COM4)</div>
-                <div id="Team2Score">0</div>
+                <div><div class="scoreboard-text">Score:</div><div id="Team2Score" class="scoreboard-text">0</div></div>
+                <div><div class="scoreboard-text">Sandbags:</div><div id="Team2Sandbags" class="scoreboard-text">0</div></div>
             </div>
         </div>
         <div id="PlayArea">
@@ -94,6 +96,8 @@
     let PlayerBidContainerDiv = null;
     let Team1ScoreDiv = null;
     let Team2ScoreDiv = null;
+    let Team1SandbagsDiv = null;
+    let Team2SandbagsDiv = null;
     let dealerIndex = null;
     let players = [];
     let currentBidCount = 0; // Once this is higher than 3, bidding is no longer active
@@ -461,16 +465,20 @@
         findCardToPlay() {
             if (this._bid === 0) {
                 if (cardsPlayedThisRound === 0) {
-                    let lowestSpade = this.getLowestSpade();
+                    if (spadesBrokenThisGame === true) {
+                        let lowestSpade = this.getLowestSpade();
                     if (lowestSpade !== null) {
                         return lowestSpade;
                     }
-                    let lowestCardAvailable = this.getLowestAvailableCard();
+                    }
+                    else {
+                        let lowestCardAvailable = this.getLowestAvailableCard();
                     if (lowestCardAvailable !== null) {
                         return lowestCardAvailable;
                     }
                     else {
                         console.log("Error: Lowest card available was null.");
+                    }
                     }
                 }
                 else {
@@ -666,8 +674,8 @@
             if (lowest !== null) {
                 return lowest;
             }
-            if (this._cards[0].length > 0) {
-                return this._cards[0].shift();
+            if (this._cards[Suit.Spade].length > 0) {
+                return this._cards[Suit.Spade].shift();
             }
             return null;
         }
@@ -879,6 +887,8 @@
         PlayerBidContainerDiv = new HtmlDiv("PlayerBidContainer");
         Team1ScoreDiv = new HtmlDiv("Team1Score");
         Team2ScoreDiv = new HtmlDiv("Team2Score");
+        Team1SandbagsDiv = new HtmlDiv("Team1Sandbags");
+        Team2SandbagsDiv = new HtmlDiv("Team2Sandbags");
 
         setCurrentPlayerTurn(getNextPlayer(dealerIndex));
         initiateBidding();
@@ -1000,6 +1010,8 @@
         let player2and4Bid = player2._bid + player4._bid;
         let player1and3Tricks = player1._tricksTaken + player3._tricksTaken;
         let player2and4Tricks = player2._tricksTaken + player4._tricksTaken;
+        let player1and3Sandbags = 0;
+        let player2and4Sandbags = 0;
 
         if (player1._bid === 0) {
             if (player1._bid === player1._tricksTaken) {
@@ -1026,14 +1038,14 @@
             Player1AndPlayer3Score += player1and3Bid * 10;
         }
         if (player1and3Bid < player1and3Tricks) {
-            let sandbags = (player1and3Tricks - player1and3Bid);
-            Player1AndPlayer3Sandbags += sandbags;
+            player1and3Sandbags = (player1and3Tricks - player1and3Bid);
+            Player1AndPlayer3Sandbags += player1and3Sandbags;
             if (Player1AndPlayer3Sandbags > 10) {
                 Player1AndPlayer3Sandbags -= 10;
                 Player1AndPlayer3Score -= 100;
             }
 
-            Player1AndPlayer3Score += sandbags;
+            Player1AndPlayer3Score += player1and3Sandbags;
         }
 
         if (player2._bid === 0) {
@@ -1061,17 +1073,19 @@
             Player2AndPlayer4Score += player2and4Bid * 10;
         }
         if (player2and4Bid < player2and4Tricks) {
-            let sandbags = (player2and4Tricks - player2and4Bid);
-            Player2AndPlayer4Sandbags += sandbags;
+            player2and4Sandbags = (player2and4Tricks - player2and4Bid);
+            Player2AndPlayer4Sandbags += player2and4Sandbags;
             if (Player2AndPlayer4Sandbags > 10) {
                 Player2AndPlayer4Sandbags -= 10;
                 Player2AndPlayer4Score -= 100;
             }
-            Player2AndPlayer4Score += sandbags;
+            Player2AndPlayer4Score += player2and4Sandbags;
         }
 
         Team1ScoreDiv.setInnerHtml(Player1AndPlayer3Score);
         Team2ScoreDiv.setInnerHtml(Player2AndPlayer4Score);
+        Team1SandbagsDiv.setInnerHtml(Player1AndPlayer3Sandbags);
+        Team2SandbagsDiv.setInnerHtml(Player2AndPlayer4Sandbags);
 
         alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and COM2 and COM4: " + Player2AndPlayer4Score);
     }
