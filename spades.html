@@ -612,12 +612,16 @@
                         }
                     }
                     else {
+                        let lowestSpadeThatCouldWin = this.getLowestSpadeThatCouldWin();
+                        if (lowestSpadeThatCouldWin !== null) {
+                            return lowestSpadeThatCouldWin;
+                        }
                         let lowestNonSpade = this.getLowestAvailableCard();
                         if (lowestNonSpade !== null) {
                             return lowestNonSpade;
                         }
                         else {
-                            return this.getLowestSpade();
+                            console.log("Error, couldn't find a card to play");
                         }
                     }
                 }
@@ -683,14 +687,14 @@
         }
 
         getLowestAvailableCardNotASpade() {
-            if (this._cards[1].length > 0) {
-                return this._cards[1].shift();
+            if (this._cards[Suit.Heart].length > 0) {
+                return this._cards[Suit.Heart].shift();
             }
-            if (this._cards[2].length > 0) {
-                return this._cards[2].shift();
+            if (this._cards[Suit.Club].length > 0) {
+                return this._cards[Suit.Club].shift();
             }
-            if (this._cards[3].length > 0) {
-                return this._cards[3].shift();
+            if (this._cards[Suit.Diamond].length > 0) {
+                return this._cards[Suit.Diamond].shift();
             }
             return null;
         }
@@ -701,6 +705,16 @@
             }
             else {
                 return null;
+            }
+        }
+
+        getLowestSpadeThatCouldWin() {
+            if (highestCurrentRoundCard._suit !== Suit.Spade) {
+                return getLowestSpade; // Return lowest Spade
+            }
+            else {
+                // TODO: Fix this path. Need to look through cards and return a good one other than the highest
+                return this._cards[Suit.Spade].pop();
             }
         }
 
@@ -721,7 +735,8 @@
             if (highestCurrentRoundCard._suit === Suit.Spade) {
                 return suitCards.shift(); // Return lowest card
             }
-            if (highestCurrentRoundCard._rank > suitCards[suitCards.length - 1]._rank) {
+            // If highestCurrentRoundCard rank is higher than my highest card in the suit
+            if (highestCurrentRoundCard._rank > suitCards[0]._rank) {
                 return suitCards.shift(); // Return lowest card
             }
             else {
