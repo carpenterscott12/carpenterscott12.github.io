@@ -113,6 +113,8 @@
     let Player2AndPlayer4Score = 0;
     let Player1AndPlayer3Sandbags = 0;
     let Player2AndPlayer4Sandbags = 0;
+    let maxScoreLimit = 250;
+    let minScoreLimit = -150;
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -428,7 +430,11 @@
 
                 totalHandsPlayed++;
                 if (totalHandsPlayed === 13) {
-                    tallyCurrentRoundScore();
+                    let endGame = tallyCurrentRoundScore();
+                    if (endGame === true) {
+                        resetGame();
+                        return;
+                    }
                     startNewRound();
                     return;
                 }
@@ -982,6 +988,7 @@
     async function selectCard(cardId) {
         // If bidding is still active, don't allow cards to be played
         if (currentPlayerTurn != 0 || currentBidCount < 4) {
+            alert("You must bid before playing a card!");
             return;
         }
         let selectedCard = Player1CardsWithInputs[cardId]._card;
@@ -1083,7 +1090,63 @@
         Team1SandbagsDiv.setInnerHtml(Player1AndPlayer3Sandbags);
         Team2SandbagsDiv.setInnerHtml(Player2AndPlayer4Sandbags);
 
-        alert("Current game score: P1 and COM3: " + Player1AndPlayer3Score + " and COM2 and COM4: " + Player2AndPlayer4Score);
+        let endGame = doesScoreEndGame(Player1AndPlayer3Score, Player2AndPlayer4Score, "Team 1", "Team 2");
+        if (endGame === true) {
+            return true;
+        }
+        else {
+            endGame = doesScoreEndGame(Player2AndPlayer4Score, Player1AndPlayer3Score, "Team 2", "Team 1");
+            if (endGame === true) {
+                return true;
+            }
+        }
+
+        alert("Current game score: Team 1: " + Player1AndPlayer3Score + " and Team 2: " + Player2AndPlayer4Score);
+        return false;
+    }
+
+    function doesScoreEndGame(firstTeamScore, secondTeamScore, firstTeamName, secondTeamName) {
+        if (firstTeamScore >= maxScoreLimit) {
+            if (secondTeamScore >= maxScoreLimit) {
+                if (firstTeamScore === secondTeamScore) {
+                    alert("The game was a tie! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    return true;
+                }
+                else if (firstTeamScore > secondTeamScore) {
+                    alert(firstTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    return true;
+                }
+                else {
+                    alert(secondTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    return true;
+                }
+            }
+            else {
+                alert(firstTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                return true;
+            }
+        }
+        if (firstTeamScore <= minScoreLimit) {
+            if (secondTeamScore <= minScoreLimit) {
+                if (firstTeamScore === secondTeamScore) {
+                    alert("The game was a tie! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    return true;
+                }
+                else if (firstTeamScore > secondTeamScore) {
+                    alert(firstTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    return true;
+                }
+                else {
+                    alert(secondTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    return true;
+                }
+            }
+            else {
+                alert(secondTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                return true;
+            }
+        }
+        return false;
     }
 
     function clearPlayAreaCards() {
@@ -1123,7 +1186,18 @@
     }
 
     function resetGame() {
+        Player1AndPlayer3Score = 0;
+        Player1AndPlayer3Sandbags = 0;
+        Player2AndPlayer4Score = 0;
+        Player2AndPlayer4Sandbags = 0;
+        Team1ScoreDiv.setInnerHtml(Player1AndPlayer3Score);
+        Team2ScoreDiv.setInnerHtml(Player2AndPlayer4Score);
+        Team1SandbagsDiv.setInnerHtml(Player1AndPlayer3Sandbags);
+        Team2SandbagsDiv.setInnerHtml(Player2AndPlayer4Sandbags);
 
+        dealerIndex = getRandomIntInclusive(0, 3);
+
+        startNewRound();
     }
 
     function sleep(milliseconds) {
