@@ -738,11 +738,12 @@
                             return goodSpade;
                         }
                     }
-                    return this.getLowestSpadeThatCouldWin();
+                    let lowestSpadeThatCouldWin = this.getLowestSpadeThatCouldWin();
+                    if (lowestSpadeThatCouldWin !== null) {
+                        return lowestSpadeThatCouldWin;
+                    }
                 }
-                else {
-                    return suitCards.shift(); // Return lowest card
-                }
+                return suitCards.shift(); // Return lowest card
             }
             // If highestCurrentRoundCard rank is higher than my highest card in the suit
             if (highestCurrentRoundCard._rank > suitCards[0]._rank) {
