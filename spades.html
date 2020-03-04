@@ -496,14 +496,12 @@
                         if (followSuitCard !== null) {
                             return followSuitCard;
                         }
+                        let lowestCard = this.getLowestAvailableCard();
+                        if (lowestCard !== null) {
+                            return lowestCard;
+                        }
                         else {
-                            let lowestCard = this.getLowestAvailableCard();
-                            if (lowestCard !== null) {
-                                return lowestCard;
-                            }
-                            else {
-                                console.log("Error: The lowest available card was null.");
-                            }
+                            console.log("Error: The lowest available card was null.");
                         }
                     }
                     else {
@@ -513,24 +511,20 @@
                             if (lowestSpade !== null) {
                                 return lowestSpade;
                             }
+                            let lowestAvailableCard = this.getLowestAvailableCard();
+                            if (lowestAvailableCard !== null) {
+                                return lowestAvailableCard;
+                            }
                             else {
-                                let lowestAvailableCard = this.getLowestAvailableCard();
-                                if (lowestAvailableCard !== null) {
-                                    return lowestAvailableCard;
-                                }
-                                else {
-                                    console.log("Error: That lowest available card was null.");
-                                }
+                                console.log("Error: That lowest available card was null.");
                             }
                         }
+                        let lowestAvailCard = this.getLowestAvailableCard();
+                        if (lowestAvailCard !== null) {
+                            return lowestAvailCard;
+                        }
                         else {
-                            let lowestAvailCard = this.getLowestAvailableCard();
-                            if (lowestAvailCard !== null) {
-                                return lowestAvailCard;
-                            }
-                            else {
-                                console.log("Error: The lowest avail card was null.");
-                            }
+                            console.log("Error: The lowest avail card was null.");
                         }
                     }
                 }
@@ -548,18 +542,16 @@
                         if (highestSpade !== null) {
                             return highestSpade;
                         }
+                        let lowestSpade = this.getLowestSpade();
+                        if (lowestSpade !== null) {
+                            return lowestSpade;
+                        }
+                        let lowestCardAvailable = this.getLowestAvailableCard();
+                        if (lowestCardAvailable !== null) {
+                            return lowestCardAvailable;
+                        }
                         else {
-                            let lowestSpade = this.getLowestSpade();
-                            if (lowestSpade !== null) {
-                                return lowestSpade;
-                            }
-                            let lowestCardAvailable = this.getLowestAvailableCard();
-                            if (lowestCardAvailable !== null) {
-                                return lowestCardAvailable;
-                            }
-                            else {
-                                console.log("Error: Lowest card available was null.");
-                            }
+                            console.log("Error: Lowest card available was null.");
                         }
                     }
                     else {
@@ -572,14 +564,12 @@
                         if (lowest !== null) {
                             return lowest;
                         }
+                        let lowestSpade = this.getLowestSpade();
+                        if (lowestSpade !== null) {
+                            return lowestSpade;
+                        }
                         else {
-                            let lowestSpade = this.getLowestSpade();
-                            if (lowestSpade !== null) {
-                                return lowestSpade;
-                            }
-                            else {
-                                console.log("Error: Lowest spade was null.");
-                            }
+                            console.log("Error: Lowest spade was null.");
                         }
                     }
                 }
@@ -590,31 +580,25 @@
                         if (followSuitCard !== null) {
                             return followSuitCard;
                         }
-                        else {
-                            if (this._tricksTaken < this._bid) {
-                                let lowestSpade = this.getLowestSpade();
-                                if (lowestSpade !== null) {
-                                    return lowestSpade;
-                                }
-                                else {
-                                    let lowestAvailable = this.getLowestAvailableCard();
-                                    if (lowestAvailable !== null) {
-                                        return lowestAvailable;
-                                    }
-                                    else {
-                                        console.log("Error: This lowest available was null.");
-                                    }
-                                }
+                        if (this._tricksTaken < this._bid) {
+                            let lowestSpade = this.getLowestSpade();
+                            if (lowestSpade !== null) {
+                                return lowestSpade;
+                            }
+                            let lowestAvailable = this.getLowestAvailableCard();
+                            if (lowestAvailable !== null) {
+                                return lowestAvailable;
                             }
                             else {
-                                let lowestCard = this.getLowestAvailableCard();
-                                if (lowestCard !== null) {
-                                    return lowestCard;
-                                }
-                                else {
-                                    console.log("Error: The lowest available card was null.");
-                                }
+                                console.log("Error: This lowest available was null.");
                             }
+                        }
+                        let lowestCard = this.getLowestAvailableCard();
+                        if (lowestCard !== null) {
+                            return lowestCard;
+                        }
+                        else {
+                            console.log("Error: The lowest available card was null.");
                         }
                     }
                     else {
