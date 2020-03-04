@@ -1225,6 +1225,13 @@
         startNewRound();
     }
 
+    function playerBidKeyupHandler(event) {
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            submitBid();
+        }
+    }
+
     function sleep(milliseconds) {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
@@ -1242,6 +1249,7 @@
     document.getElementById("playerCard10").addEventListener('click', function () { selectCard(10) });
     document.getElementById("playerCard11").addEventListener('click', function () { selectCard(11) });
     document.getElementById("playerCard12").addEventListener('click', function () { selectCard(12) });
+    document.getElementById("PlayerBidInput").addEventListener('keyup', function (event) { playerBidKeyupHandler(event) });
     document.getElementById("PlayerBidSubmit").addEventListener('click', function () { submitBid() });
 
     // Main game:

@@ -32,7 +32,11 @@
 }
 
 #Team1NameAndScore {
-    margin-bottom: 10px;
+    float: left;
+}
+
+#Team2NameAndScore {
+    float: right;
 }
 
 #GameContainer {
@@ -40,7 +44,7 @@
 }
 
 #ScoreArea {
-    width: 320px;
+    width: 100%;
     text-align: center;
     margin-bottom: 20px;
     margin-left: auto;
