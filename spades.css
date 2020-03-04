@@ -8,6 +8,11 @@
     border: 0px;
 }
 
+.player-card:hover {
+    transition: transform 0.5 linear;
+    transform: translateY(-10px);
+}
+
 .play-area-card {
     width: 40px;
     height: 60px;
