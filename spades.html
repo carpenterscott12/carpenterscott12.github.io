@@ -469,18 +469,16 @@
                 if (cardsPlayedThisRound === 0) {
                     if (spadesBrokenThisGame === true) {
                         let lowestSpade = this.getLowestSpade();
-                    if (lowestSpade !== null) {
-                        return lowestSpade;
+                        if (lowestSpade !== null) {
+                            return lowestSpade;
+                        }
                     }
-                    }
-                    else {
-                        let lowestCardAvailable = this.getLowestAvailableCard();
+                    let lowestCardAvailable = this.getLowestAvailableCard();
                     if (lowestCardAvailable !== null) {
                         return lowestCardAvailable;
                     }
                     else {
                         console.log("Error: Lowest card available was null.");
-                    }
                     }
                 }
                 else {
@@ -627,9 +625,6 @@
                 }
             }
 
-
-
-
         }
 
         getNonSpadeAce() {
@@ -710,7 +705,7 @@
 
         getLowestSpadeThatCouldWin() {
             if (highestCurrentRoundCard._suit !== Suit.Spade) {
-                return getLowestSpade; // Return lowest Spade
+                return this.getLowestSpade(); // Return lowest Spade
             }
             else {
                 // TODO: Fix this path. Need to look through cards and return a good one other than the highest
