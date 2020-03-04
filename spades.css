@@ -21,6 +21,46 @@
     border: 0px;
 }
 
+.play-area-card.down {
+    transition: transform 0.5s linear;
+    transform: translateY(200px);
+}
+
+.play-area-card.up {
+    transition: transform 0.5s linear;
+    transform: translateY(-200px);
+}
+
+.play-area-card.right {
+    transition: transform 0.5s linear;
+    transform: translateX(220px);
+}
+
+.play-area-card.left {
+    transition: transform 0.5s linear;
+    transform: translateX(-220px);
+}
+
+.play-area-card.down-right {
+    transition: transform 0.5s linear;
+    transform: translate(110px, 115px);
+}
+
+.play-area-card.up-right {
+    transition: transform 0.5s linear;
+    transform: translate(110px, -110px);
+}
+
+.play-area-card.down-left {
+    transition: transform 0.5s linear;
+    transform: translate(-110px, 115px);
+}
+
+.play-area-card.up-left {
+    transition: transform 0.5s linear;
+    transform: translate(-110px, -110px);
+}
+
 .data-text {
     text-align: center;
     font-size: 14px;
