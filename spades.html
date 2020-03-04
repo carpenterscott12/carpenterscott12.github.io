@@ -733,7 +733,7 @@
                 if (currentRoundSuit === Suit.Spade) {
                     // The current round's suit is Spades, so try to win with a good spade
                     if (highestCurrentRoundCard._rank > 11) {
-                        let goodSpade = this.getHighestAvailableSpade; // TODO: Remember this only gets Q, K, or A right now, so it's not guaranteed to return a valid card. Need to update it eventually
+                        let goodSpade = this.getHighestAvailableSpade(); // TODO: Remember this only gets Q, K, or A right now, so it's not guaranteed to return a valid card. Need to update it eventually
                         if (goodSpade !== null) {
                             return goodSpade;
                         }
