@@ -646,6 +646,11 @@
                     return this._cards[i].pop();
                 }
             }
+            for (i = 1; i < this._cards.length; i++) {
+                if (this.containsAJack(this._cards[i]) === true) {
+                    return this._cards[i].pop();
+                }
+            }
             return null;
         }
 
@@ -725,7 +730,12 @@
                 return null;
             }
             if (highestCurrentRoundCard._suit === Suit.Spade) {
-                return suitCards.shift(); // Return lowest card
+                if (currentRoundSuit === Suit.Spade) {
+                    return this.getLowestSpadeThatCouldWin();
+                }
+                else {
+                    return suitCards.shift(); // Return lowest card
+                }
             }
             // If highestCurrentRoundCard rank is higher than my highest card in the suit
             if (highestCurrentRoundCard._rank > suitCards[0]._rank) {
@@ -845,6 +855,15 @@
 
         containsAQueen(cardArray) {
             if (cardArray.find(card => card._rank === 12) !== undefined) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        containsAJack(cardArray) {
+            if (cardArray.find(card => card._rank === 11) !== undefined) {
                 return true;
             }
             else {
