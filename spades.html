@@ -13,8 +13,10 @@
             <div id="Team1NameAndScore">
                 <div id="Team1Name">Team 1 (Player1 and COM3)</div>
                 <div><div class="scoreboard-text">Score:</div><div id="Team1Score" class="scoreboard-text">0</div></div>
+                
                 <div><div class="scoreboard-text">Sandbags:</div><div id="Team1Sandbags" class="scoreboard-text">0</div></div>
             </div>
+            <div id="ScoreLimitText" title="The score limit determines when the game is over. If you have -150 points or fewer, you lose. If you have 250 points or more, you win.">Score limit: (Min -150 / Max 250)</div>
             <div id="Team2NameAndScore">
                 <div id="Team2Name">Team 2 (COM2 and COM4)</div>
                 <div><div class="scoreboard-text">Score:</div><div id="Team2Score" class="scoreboard-text">0</div></div>
@@ -25,7 +27,7 @@
             <div id="Player3Data">
                 <div id="Player3Card" class="play-area-card"></div>
                 <div id="Player3Name" class="data-text">COM3</div>
-                <div id="Player3TricksToBids" class="data-text">
+                <div id="Player3TricksToBids" title="The left number is the number of tricks won. The right number is the player's bid." class="data-text">
                     <div id="Player3Tricks" class="data-text">-</div>/<div id="Player3Bid" class="data-text">-</div>
                 </div>
             </div>
@@ -33,14 +35,14 @@
                 <div id="Player2Data">
                     <div id="Player2Card" class="play-area-card"></div>
                     <div id="Player2Name" class="data-text">COM2</div>
-                    <div id="Player2TricksToBids" class="data-text">
+                    <div id="Player2TricksToBids" title="The left number is the number of tricks won. The right number is the player's bid." class="data-text">
                         <div id="Player2Tricks" class="data-text">-</div>/<div id="Player2Bid" class="data-text">-</div>
                     </div>
                 </div>
                 <div id="Player4Data">
                     <div id="Player4Card" class="play-area-card"></div>
                     <div id="Player4Name" class="data-text">COM4</div>
-                    <div id="Player4TricksToBids" class="data-text">
+                    <div id="Player4TricksToBids" title="The left number is the number of tricks won. The right number is the player's bid." class="data-text">
                         <div id="Player4Tricks" class="data-text">-</div>/<div id="Player4Bid" class="data-text">-</div>
                     </div>
                 </div>
@@ -48,7 +50,7 @@
             <div id="Player1Data">
                 <div id="Player1Card" class="play-area-card"></div>
                 <div id="Player1Name" class="data-text">Player1</div>
-                <div id="Player1TricksToBids" class="data-text">
+                <div id="Player1TricksToBids" title="The left number is the number of tricks won. The right number is the player's bid." class="data-text">
                     <div id="Player1Tricks" class="data-text">-</div>/<div id="Player1Bid" class="data-text">-</div>
                 </div>
             </div>
@@ -69,8 +71,8 @@
             <input id="playerCard12" class="player-card" type="button" />
         </div>
         <div id="PlayerBidContainer">
-            <div id="BidLabel">Bid:</div>
-            <input id="PlayerBidInput" type="text" />
+            <div id="BidLabel">Enter Bid:</div>
+            <input id="PlayerBidInput" placeholder="# of tricks" type="text" />
             <input id="PlayerBidSubmit" type="button" value="Submit" />
         </div>
     </div>
