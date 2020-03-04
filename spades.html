@@ -701,7 +701,12 @@
             }
             else {
                 // TODO: Fix this path. Need to look through cards and return a good one other than the highest
-                return this._cards[Suit.Spade].pop();
+                if (this._cards[Suit.Spade].length > 0) {
+                    return this._cards[Suit.Spade].pop();
+                }
+                else {
+                    return null;
+                }
             }
         }
 
@@ -1052,7 +1057,7 @@
         if (player1and3Bid < player1and3Tricks) {
             player1and3Sandbags = (player1and3Tricks - player1and3Bid);
             Player1AndPlayer3Sandbags += player1and3Sandbags;
-            if (Player1AndPlayer3Sandbags > 10) {
+            if (Player1AndPlayer3Sandbags >= 10) {
                 Player1AndPlayer3Sandbags -= 10;
                 Player1AndPlayer3Score -= 100;
             }
@@ -1087,7 +1092,7 @@
         if (player2and4Bid < player2and4Tricks) {
             player2and4Sandbags = (player2and4Tricks - player2and4Bid);
             Player2AndPlayer4Sandbags += player2and4Sandbags;
-            if (Player2AndPlayer4Sandbags > 10) {
+            if (Player2AndPlayer4Sandbags >= 10) {
                 Player2AndPlayer4Sandbags -= 10;
                 Player2AndPlayer4Score -= 100;
             }
