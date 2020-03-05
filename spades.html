@@ -7,8 +7,8 @@
 </head>
 
 <body>
-    <div id="ScoreBoardModal">
-        <div id="ScoreBoardModalBox">
+    <div id="ScoreboardModal">
+        <div id="ScoreboardModalBox">
             <div id="ModalTitle">Score Summary:</div>
             <div id="ModalTeam1Board">
                 <div id="ModalTeam1Title">Team 1:</div>
@@ -569,7 +569,7 @@
             if (this._bid === 0) {
                 if (cardsPlayedThisRound === 0) {
                     if (spadesBrokenThisGame === true) {
-                        let lowestSpade = this.getLowestSpade();
+                        let lowestSpade = this.getLowestOfSuit(Suit.Spade);
                         if (lowestSpade !== null) {
                             return lowestSpade;
                         }
@@ -600,7 +600,7 @@
                     else {
                         // You can either play a spade or throw off a bad card from another suit
                         if (this._tricksTaken < this._bid) {
-                            let lowestSpade = this.getLowestSpade();
+                            let lowestSpade = this.getLowestOfSuit(Suit.Spade);
                             if (lowestSpade !== null) {
                                 return lowestSpade;
                             }
@@ -631,11 +631,11 @@
                         if (nonSpadeAce !== null) {
                             return nonSpadeAce;
                         }
-                        let highestSpade = this.getHighestAvailableSpade();
+                        let highestSpade = this.getHighSpadeIfAvailable();
                         if (highestSpade !== null) {
                             return highestSpade;
                         }
-                        let lowestSpade = this.getLowestSpade();
+                        let lowestSpade = this.getLowestOfSuit(Suit.Spade);
                         if (lowestSpade !== null) {
                             return lowestSpade;
                         }
@@ -657,7 +657,7 @@
                         if (lowest !== null) {
                             return lowest;
                         }
-                        let lowestSpade = this.getLowestSpade();
+                        let lowestSpade = this.getLowestOfSuit(Suit.Spade);
                         if (lowestSpade !== null) {
                             return lowestSpade;
                         }
@@ -674,7 +674,7 @@
                             return followSuitCard;
                         }
                         if (this._tricksTaken < this._bid) {
-                            let lowestSpade = this.getLowestSpade();
+                            let lowestSpade = this.getLowestOfSuit(Suit.Spade);
                             if (lowestSpade !== null) {
                                 return lowestSpade;
                             }
@@ -709,7 +709,6 @@
                     }
                 }
             }
-
         }
 
         getNonSpadeAce() {
@@ -747,7 +746,7 @@
             return null;
         }
 
-        getHighestAvailableSpade() {
+        getHighSpadeIfAvailable() {
             if (this.containsAnAce(this._cards[0]) === true) {
                 return this._cards[0].pop();
             }
@@ -784,18 +783,9 @@
             return null;
         }
 
-        getLowestSpade() {
-            if (this._cards[0].length > 0) {
-                return this._cards[0].shift();
-            }
-            else {
-                return null;
-            }
-        }
-
         getLowestSpadeThatCouldWin() {
             if (highestCurrentRoundCard._suit !== Suit.Spade) {
-                return this.getLowestSpade(); // Return lowest Spade
+                return this.getLowestOfSuit(Suit.Spade); // Return lowest Spade
             }
             else {
                 // TODO: Fix this path. Need to look through cards and return a good one other than the highest
@@ -825,8 +815,8 @@
             if (highestCurrentRoundCard._suit === Suit.Spade) {
                 if (currentRoundSuit === Suit.Spade) {
                     // The current round's suit is Spades, so try to win with a good spade
-                    if (highestCurrentRoundCard._rank > 11) {
-                        let goodSpade = this.getHighestAvailableSpade(); // TODO: Remember this only gets Q, K, or A right now, so it's not guaranteed to return a valid card. Need to update it eventually
+                    if (highestCurrentRoundCard._rank > 9) {
+                        let goodSpade = this.getHighSpadeIfAvailable(); // TODO: Remember this only gets Q, K, or A right now, so it's not guaranteed to return a valid card. Need to update it eventually
                         if (goodSpade !== null) {
                             return goodSpade;
                         }
@@ -992,9 +982,9 @@
         }
     }
 
-    class ScoreBoard {
+    class Scoreboard {
         constructor() {
-            this._scoreboardModal = new HtmlDiv("ScoreBoardModal");
+            this._scoreboardModal = new HtmlDiv("ScoreboardModal");
 
             this._player1NilResultText = new HtmlDiv("ModalPlayer1NilResultText");
             this._player1NilResultValue = new HtmlDiv("ModalPlayer1NilResultValue");

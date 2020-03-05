@@ -54,7 +54,7 @@
 
 .play-area-card.down-right {
     transition: transform 0.5s linear;
-    transform: translate(110px, 115px);
+    transform: translate(110px, 105px);
 }
 
 .play-area-card.up-right {
@@ -64,7 +64,7 @@
 
 .play-area-card.down-left {
     transition: transform 0.5s linear;
-    transform: translate(-110px, 115px);
+    transform: translate(-110px, 105px);
 }
 
 .play-area-card.up-left {
@@ -82,7 +82,7 @@
     margin-right: 5px;
 }
 
-#ScoreBoardModal {
+#ScoreboardModal {
     display: none;
     position: fixed;
     z-index: 1;
@@ -94,7 +94,7 @@
     background-color: rgba(33, 33, 33, 0.5);
 }
 
-#ScoreBoardModalBox {
+#ScoreboardModalBox {
     background-color: #424242;
     margin: 40px auto;
     padding: 20px;
