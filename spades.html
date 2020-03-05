@@ -778,14 +778,14 @@
         }
 
         getHighSpadeIfAvailable() {
-            if (this.containsAnAce(this._cards[0]) === true) {
-                return this._cards[0].pop();
+            if (this.containsAnAce(this._cards[Suit.Spade]) === true) {
+                return this._cards[Suit.Spade].pop();
             }
-            if (this.containsAKing(this._cards[0]) === true) {
-                return this._cards[0].pop();
+            if (this.containsAKing(this._cards[Suit.Spade]) === true) {
+                return this._cards[Suit.Spade].pop();
             }
-            if (this.containsAQueen(this._cards[0]) === true) {
-                return this._cards[0].pop();
+            if (this.containsAQueen(this._cards[Suit.Spade]) === true) {
+                return this._cards[Suit.Spade].pop();
             }
             return null;
         }
@@ -860,7 +860,7 @@
                 return suitCards.shift(); // Return lowest card
             }
             // If highestCurrentRoundCard rank is higher than my highest card in the suit
-            if (highestCurrentRoundCard._rank > suitCards[0]._rank) {
+            if (highestCurrentRoundCard._rank > suitCards[suitCards.length - 1]._rank) {
                 return suitCards.shift(); // Return lowest card
             }
             else {
@@ -934,8 +934,9 @@
                     }
                 }
                 // If we have 5 spades, assume that we'll be able to get at least one more trick
-                if (this._cards[0].length > 4) {
-                    currentBid++;
+                if (this._cards[Suit.Spade].length > 4) {
+                    let spadesOver4 = this._cards[Suit.Spade].length - 4;
+                    currentBid += spadesOver3;
                 }
             }
 
@@ -948,10 +949,13 @@
 
         getSuitBidCount(cardArray) {
             let currentBid = 0;
-            if (cardArray.length < 5 && this.containsAnAce(cardArray) === true) {
-                currentBid++;
-            }
-            if (cardArray.length < 3 && this.containsQueenOrKing(cardArray) === true) {
+            if (cardArray.length < 6 && this.containsAnAce(cardArray) === true) {
+                if (cardArray.length < 4 && this.containsAKing(cardArray) === true) {
+                    currentBid++;
+                }
+                if (cardArray.length < 3 && this.containsAQueen(cardArray) === true) {
+                    currentBid++;
+                }
                 currentBid++;
             }
             return currentBid;
@@ -1151,8 +1155,6 @@
         setTeam2TotalSandbags(total) {
             this._modalTeam2TotalSandbagsValue.setInnerHtml(total);
         }
-
-
     }
 
     // Functions
