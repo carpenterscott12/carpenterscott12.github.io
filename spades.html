@@ -12,13 +12,13 @@
             <div id="ModalTitle">Score Summary:</div>
             <div id="ModalTeam1Board">
                 <div id="ModalTeam1Title">Team 1:</div>
-                <div id="ModalPlayer1NilBonusText">
+                <div id="ModalPlayer1NilResultText">
                     <div class="modal-scoreboard-label">Player 1 Nil Result:</div>
-                    <div id="ModalPlayer1NilBonusValue" class="modal-scoreboard-label">0</div>
+                    <div id="ModalPlayer1NilResultValue" class="modal-scoreboard-label">0</div>
                 </div>
-                <div id="ModalPlayer3NilBonusText">
+                <div id="ModalPlayer3NilResultText">
                     <div class="modal-scoreboard-label">Player 3 Nil Result:</div>
-                    <div id="ModalPlayer3NilBonusValue" class="modal-scoreboard-label">0</div>
+                    <div id="ModalPlayer3NilResultValue" class="modal-scoreboard-label">0</div>
                 </div>
                 <div id="ModalTeam1BidLabel">
                     <div class="modal-scoreboard-label">Combined Team Bid:</div>
@@ -53,13 +53,13 @@
             
             <div id="ModalTeam2Board">
                 <div id="ModalTeam2Title">Team 2:</div>
-                <div id="ModalPlayer2NilBonusText">
+                <div id="ModalPlayer2NilResultText">
                     <div class="modal-scoreboard-label">Player 2 Nil Result:</div>
-                    <div id="ModalPlayer2NilBonusValue" class="modal-scoreboard-label">0</div>
+                    <div id="ModalPlayer2NilResultValue" class="modal-scoreboard-label">0</div>
                 </div>
-                <div id="ModalPlayer4NilBonusText">
+                <div id="ModalPlayer4NilResultText">
                     <div class="modal-scoreboard-label">Player 4 Nil Result:</div>
-                    <div id="ModalPlayer4NilBonusValue" class="modal-scoreboard-label">0</div>
+                    <div id="ModalPlayer4NilResultValue" class="modal-scoreboard-label">0</div>
                 </div>
                 <div id="ModalTeam2BidLabel">
                     <div class="modal-scoreboard-label">Combined Team Bid:</div>
@@ -995,7 +995,44 @@
     class ScoreBoard {
         constructor() {
             this._scoreboardModal = new HtmlDiv("ScoreBoardModal");
-            
+
+            this._player1NilResultText = new HtmlDiv("ModalPlayer1NilResultText");
+            this._player1NilResultValue = new HtmlDiv("ModalPlayer1NilResultValue");
+            this._player3NilResultText = new HtmlDiv("ModalPlayer3NilResultText");
+            this._player3NilResultValue = new HtmlDiv("ModalPlayer3NilResultValue");
+            this._modalTeam1BidLabel = new HtmlDiv("ModalTeam1BidLabel");
+            this._modalTeam1BidValue = new HtmlDiv("ModalTeam1BidValue");
+            this._modalTeam1TricksLabel = new HtmlDiv("ModalTeam1TricksLabel");
+            this._modalTeam1TricksValue = new HtmlDiv("ModalTeam1TricksValue");
+            this._modalTeam1BidResultLabel = new HtmlDiv("ModalTeam1BidResultLabel");
+            this._modalTeam1BidResultValue = new HtmlDiv("ModalTeam1BidResultValue");
+            this._modalTeam1SandbagsLabel = new HtmlDiv("ModalTeam1SandbagsLabel");
+            this._modalTeam1SandbagsValue = new HtmlDiv("ModalTeam1SandbagsValue");
+            this._modalTeam1SandbagPenaltyLabel = new HtmlDiv("ModalTeam1SandbagPenaltyLabel");
+            this._modalTeam1SandbagPenaltyValue = new HtmlDiv("ModalTeam1SandbagPenaltyValue");
+            this._modalTeam1TotalScoreLabel = new HtmlDiv("ModalTeam1TotalScoreLabel");
+            this._modalTeam1TotalScoreValue = new HtmlDiv("ModalTeam1TotalScoreValue");
+            this._modalTeam1TotalSandbagsLabel = new HtmlDiv("ModalTeam1TotalSandbagsLabel");
+            this._modalTeam1TotalSandbagsValue = new HtmlDiv("ModalTeam1TotalSandbagsValue");
+
+            this._player2NilResultText = new HtmlDiv("ModalPlayer2NilResultText");
+            this._player2NilResultValue = new HtmlDiv("ModalPlayer2NilResultValue");
+            this._player4NilResultText = new HtmlDiv("ModalPlayer4NilResultText");
+            this._player4NilResultValue = new HtmlDiv("ModalPlayer4NilResultValue");
+            this._modalTeam2BidLabel = new HtmlDiv("ModalTeam2BidLabel");
+            this._modalTeam2BidValue = new HtmlDiv("ModalTeam2BidValue");
+            this._modalTeam2TricksLabel = new HtmlDiv("ModalTeam2TricksLabel");
+            this._modalTeam2TricksValue = new HtmlDiv("ModalTeam2TricksValue");
+            this._modalTeam2BidResultLabel = new HtmlDiv("ModalTeam2BidResultLabel");
+            this._modalTeam2BidResultValue = new HtmlDiv("ModalTeam2BidResultValue");
+            this._modalTeam2SandbagsLabel = new HtmlDiv("ModalTeam2SandbagsLabel");
+            this._modalTeam2SandbagsValue = new HtmlDiv("ModalTeam2SandbagsValue");
+            this._modalTeam2SandbagPenaltyLabel = new HtmlDiv("ModalTeam2SandbagPenaltyLabel");
+            this._modalTeam2SandbagPenaltyValue = new HtmlDiv("ModalTeam2SandbagPenaltyValue");
+            this._modalTeam2TotalScoreLabel = new HtmlDiv("ModalTeam2TotalScoreLabel");
+            this._modalTeam2TotalScoreValue = new HtmlDiv("ModalTeam2TotalScoreValue");
+            this._modalTeam2TotalSandbagsLabel = new HtmlDiv("ModalTeam2TotalSandbagsLabel");
+            this._modalTeam2TotalSandbagsValue = new HtmlDiv("ModalTeam2TotalSandbagsValue");
         }
     }
 
