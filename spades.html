@@ -51,7 +51,6 @@
                     </div>
                 </div>
     
-    
                 <div id="ModalTeam2Board">
                     <div id="ModalTeam2Title">Team 2:</div>
                     <div id="ModalPlayer2NilResultText">
@@ -234,6 +233,7 @@
     let minScoreLimit = -150;
     let scoreboardModal = null;
     let endGame = false;
+    let handlingPlayerClick = false;
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
     const rankStrings = ["", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -348,6 +348,11 @@
             this._card = card;
             this._htmlInput = htmlInput;
             this._htmlInput.showInlineBlock();
+            this._handlingClick = false;
+        }
+
+        setHandlingClick(input) {
+            this._handlingClick = input;
         }
     }
 
@@ -569,12 +574,10 @@
                 }
 
                 setCurrentPlayerTurn(winnerIndex);
+                handlingPlayerClick = false;
                 let newRoundPlayer = players[currentPlayerTurn];
 
                 if (!newRoundPlayer._isHuman) {
-                    if (newRoundPlayer._cards[1].length === 0) {
-                        console.log("Hearts suit has zero cards.");
-                    }
                     await sleep(500);
                     await newRoundPlayer.playCard(newRoundPlayer.findCardToPlay());
                     return;
@@ -1180,6 +1183,7 @@
         Team2SandbagsDiv = new HtmlDiv("Team2Sandbags");
         scoreboardModal = new Scoreboard();
         scoreboardModal.hideAllConditionalDetails();
+        handlingPlayerClick = false;
 
         setCurrentPlayerTurn(getNextPlayer(dealerIndex));
         initiateBidding();
@@ -1286,25 +1290,40 @@
     }
 
     async function selectCard(cardId) {
+        if (handlingPlayerClick === true) {
+            return;
+        }
+        handlingPlayerClick = true;
         // If bidding is still active, don't allow cards to be played
-        if (currentPlayerTurn != 0 || currentBidCount < 4) {
+        if (currentBidCount < 4) {
             alert("You must bid before playing a card!");
+            handlingPlayerClick = false;
+            return;
+        }
+        if (currentPlayerTurn !== 0) {
+            alert("You must wait for your turn!");
+            handlingPlayerClick = false;
             return;
         }
         let selectedCard = Player1CardsWithInputs[cardId]._card;
         if (currentRoundSuit === null && selectedCard._suit === Suit.Spade && spadesBrokenThisGame === false) {
             alert("Spades have not been broken this game!");
+            handlingPlayerClick = false;
             return;
         }
         if (currentRoundSuit !== null && selectedCard._suit !== currentRoundSuit) {
             if (player1._cards[currentRoundSuit].length > 0) {
                 alert("You must follow suit!");
+                handlingPlayerClick = false;
                 return;
             }
         }
         if (Player1CardsWithInputs !== null && Player1CardsWithInputs.length > cardId) {
             Player1CardsWithInputs[cardId]._htmlInput.hide();
             await player1.playCard(Player1CardsWithInputs[cardId]._card);
+        }
+        else {
+            console.log("Player1CardsWithInputs was null in selectCard function");
         }
     }
 
@@ -1523,6 +1542,7 @@
     }
 
     function startNewRound() {
+        handlingPlayerClick = false;
         spadesBrokenThisGame = false;
         currentPlayedCards = [null, null, null, null];
         cardsPlayedThisRound = 0;
@@ -1543,6 +1563,7 @@
     }
 
     function resetGame() {
+        handlingPlayerClick = false;
         endGame = false;
         Player1AndPlayer3Score = 0;
         Player1AndPlayer3Sandbags = 0;
