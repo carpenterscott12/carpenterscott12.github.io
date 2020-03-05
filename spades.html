@@ -10,7 +10,87 @@
     <div id="ScoreBoardModal">
         <div id="ScoreBoardModalBox">
             <div id="ModalTitle">Score Summary:</div>
-            <div id="ModalTeam1Title">Team 1:</div>
+            <div id="ModalTeam1Board">
+                <div id="ModalTeam1Title">Team 1:</div>
+                <div id="ModalPlayer1NilBonusText">
+                    <div class="modal-scoreboard-label">Player 1 Nil Result:</div>
+                    <div id="ModalPlayer1NilBonusValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalPlayer3NilBonusText">
+                    <div class="modal-scoreboard-label">Player 3 Nil Result:</div>
+                    <div id="ModalPlayer3NilBonusValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1BidLabel">
+                    <div class="modal-scoreboard-label">Combined Team Bid:</div>
+                    <div id="ModalTeam1BidValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1TricksLabel">
+                    <div class="modal-scoreboard-label">Combined Team Tricks:</div>
+                    <div id="ModalTeam1TricksValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1BidResultLabel">
+                    <div class="modal-scoreboard-label">Bid Contract Result:</div>
+                    <div id="ModalTeam1BidResultValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1SandbagsLabel">
+                    <div class="modal-scoreboard-label">Sandbags Taken This Round:</div>
+                    <div id="ModalTeam1SandbagsValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1SandbagPenaltyLabel">
+                    <div class="modal-scoreboard-label">Sandbag Penalty (10 bags = -100):</div>
+                    <div id="ModalTeam1SandbagPenaltyLabel" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1TotalScoreLabel">
+                    <div class="modal-scoreboard-label">Total Score:</div>
+                    <div id="ModalTeam1TotalScoreValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam1TotalSandbagsLabel">
+                    <div class="modal-scoreboard-label">Total Sandbags:</div>
+                    <div id="ModalTeam1TotalSandbagsLabel" class="modal-scoreboard-label">0</div>
+                </div>
+            </div>
+
+            
+            <div id="ModalTeam2Board">
+                <div id="ModalTeam2Title">Team 2:</div>
+                <div id="ModalPlayer2NilBonusText">
+                    <div class="modal-scoreboard-label">Player 2 Nil Result:</div>
+                    <div id="ModalPlayer2NilBonusValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalPlayer4NilBonusText">
+                    <div class="modal-scoreboard-label">Player 4 Nil Result:</div>
+                    <div id="ModalPlayer4NilBonusValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2BidLabel">
+                    <div class="modal-scoreboard-label">Combined Team Bid:</div>
+                    <div id="ModalTeam2BidValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2TricksLabel">
+                    <div class="modal-scoreboard-label">Combined Team Tricks:</div>
+                    <div id="ModalTeam2TricksValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2BidResultLabel">
+                    <div class="modal-scoreboard-label">Bid Contract Result:</div>
+                    <div id="ModalTeam2BidResultValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2SandbagsLabel">
+                    <div class="modal-scoreboard-label">Sandbags Taken This Round:</div>
+                    <div id="ModalTeam2SandbagsValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2SandbagPenaltyLabel">
+                    <div class="modal-scoreboard-label">Sandbag Penalty (10 bags = -100):</div>
+                    <div id="ModalTeam2SandbagPenaltyLabel" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2TotalScoreLabel">
+                    <div class="modal-scoreboard-label">Total Score:</div>
+                    <div id="ModalTeam2TotalScoreValue" class="modal-scoreboard-label">0</div>
+                </div>
+                <div id="ModalTeam2TotalSandbagsLabel">
+                    <div class="modal-scoreboard-label">Total Sandbags:</div>
+                    <div id="ModalTeam2TotalSandbagsLabel" class="modal-scoreboard-label">0</div>
+                </div>
+            </div>
+    
         </div>
     </div>
     <div id="GameContainer">
@@ -909,6 +989,13 @@
                 }
             }
             return false;
+        }
+    }
+
+    class ScoreBoard {
+        constructor() {
+            this._scoreboardModal = new HtmlDiv("ScoreBoardModal");
+            
         }
     }
 

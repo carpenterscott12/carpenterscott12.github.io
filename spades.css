@@ -13,6 +13,12 @@
     transform: translateY(-10px);
 }
 
+.modal-scoreboard-label {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 18px;
+}
+
 .play-area-card {
     width: 40px;
     height: 60px;
@@ -84,17 +90,17 @@
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: rgb(33, 33, 33);
     background-color: rgba(33, 33, 33, 0.5);
 }
 
 #ScoreBoardModalBox {
     background-color: #424242;
-    margin: 15% auto;
+    margin: 40px auto;
     padding: 20px;
     border: 1px solid #212121;
     width: 50%;
+    height: 400px;
     text-align: left;
     font-size: 20px;
 }
@@ -104,6 +110,15 @@
     margin: 0 auto;
     text-align: center;
     width: 200px;
+    margin-bottom: 10px;
+}
+
+#ModalTeam1Board {
+    float: left;
+}
+
+#ModalTeam2Board {
+    float: right;
 }
 
 #ScoreLimitText {
