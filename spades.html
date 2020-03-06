@@ -1020,6 +1020,7 @@
     class Scoreboard {
         constructor() {
             this._scoreboardModal = new HtmlDiv("ScoreboardModal");
+            this._scoreboardTitle = new HtmlDiv("ModalTitle");
 
             this._player1NilResultText = new HtmlDiv("ModalPlayer1NilResultText");
             this._player1NilResultValue = new HtmlDiv("ModalPlayer1NilResultValue");
@@ -1058,6 +1059,22 @@
             this._modalTeam2TotalScoreValue = new HtmlDiv("ModalTeam2TotalScoreValue");
             this._modalTeam2TotalSandbagsLabel = new HtmlDiv("ModalTeam2TotalSandbagsLabel");
             this._modalTeam2TotalSandbagsValue = new HtmlDiv("ModalTeam2TotalSandbagsValue");
+
+            this._modalContinue = new HtmlInput("ModalContinue");
+        }
+
+        updateScoreboardTitle(title) {
+            this._scoreboardTitle.setInnerHtml(title);
+            this._scoreboardTitle.setColorGreen();
+        }
+
+        resetScoreboardTitle() {
+            this._scoreboardTitle.setInnerHtml("Score Summary:");
+            this._scoreboardTitle.setColorWhite();
+        }
+
+        updateModalButtonText(text) {
+            this._modalContinue.setValue(text);
         }
 
         showScoreboard() {
@@ -1443,11 +1460,13 @@
 
         let endGame = doesScoreEndGame(Player1AndPlayer3Score, Player2AndPlayer4Score, "Team 1", "Team 2");
         if (endGame === true) {
+            scoreboardModal.updateModalButtonText("Finish");
             return true;
         }
         else {
             endGame = doesScoreEndGame(Player2AndPlayer4Score, Player1AndPlayer3Score, "Team 2", "Team 1");
             if (endGame === true) {
+                scoreboardModal.updateModalButtonText("Finish");
                 return true;
             }
         }
@@ -1461,19 +1480,23 @@
             if (secondTeamScore >= maxScoreLimit) {
                 if (firstTeamScore === secondTeamScore) {
                     //alert("The game was a tie! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    scoreboardModal.updateScoreboardTitle("The game was a tie!");
                     return true;
                 }
                 else if (firstTeamScore > secondTeamScore) {
                     //alert(firstTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    scoreboardModal.updateScoreboardTitle(firstTeamName + " wins!");
                     return true;
                 }
                 else {
                     //alert(secondTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    scoreboardModal.updateScoreboardTitle(secondTeamName + " wins!");
                     return true;
                 }
             }
             else {
                 //alert(firstTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                scoreboardModal.updateScoreboardTitle(firstTeamName + " wins!");
                 return true;
             }
         }
@@ -1481,19 +1504,23 @@
             if (secondTeamScore <= minScoreLimit) {
                 if (firstTeamScore === secondTeamScore) {
                     //alert("The game was a tie! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    scoreboardModal.updateScoreboardTitle("The game was a tie!");
                     return true;
                 }
                 else if (firstTeamScore > secondTeamScore) {
                     //alert(firstTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    scoreboardModal.updateScoreboardTitle(firstTeamName + " wins!");
                     return true;
                 }
                 else {
                     //alert(secondTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                    scoreboardModal.updateScoreboardTitle(secondTeamName + " wins!");
                     return true;
                 }
             }
             else {
                 //alert(secondTeamName + " wins! " + firstTeamName + ": " + firstTeamScore + " and " + secondTeamName + ": " + secondTeamScore);
+                scoreboardModal.updateScoreboardTitle(secondTeamName + " wins!");
                 return true;
             }
         }
@@ -1584,6 +1611,8 @@
     function closeScoreboardModal() {
         scoreboardModal.hideScoreboard();
         scoreboardModal.hideAllConditionalDetails();
+        scoreboardModal.resetScoreboardTitle();
+        scoreboardModal.updateModalButtonText("Continue");
         if (endGame === true) {
             resetGame();
             return;
