@@ -185,8 +185,27 @@
     margin-right: auto;
 }
 
+#SpadeLogo {
+    display: none;
+    text-align: center;
+    font-size: 80px;
+    color: #121212;
+    text-shadow: 0px 0px 5px #FFFFFF;
+    cursor: default;
+    animation-name: white-to-black;
+    animation-duration: 2s;
+}
+
+@keyframes white-to-black {
+    from {color: #FFFFFF;
+        text-shadow: 0px 0px 0px #121212;}
+    to {color: #121212;
+        text-shadow: 0px 0px 5px #FFFFFF;}
+}
+
 #WestAndEastCardContainer {
-    display: inline-block;
+    display: block;
+    height: 105px;
     width: inherit;
 }
 
