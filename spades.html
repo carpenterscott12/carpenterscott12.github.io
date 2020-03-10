@@ -149,9 +149,6 @@
                         <div id="Player2Tricks" class="data-text">-</div>/<div id="Player2Bid" class="data-text">-</div>
                     </div>
                 </div>
-                <div id="SpadeLogo" title="Spades have been broken!">
-                    ♠
-                </div>
                 <div id="Player4Data">
                     <div id="Player4Card" class="play-area-card"></div>
                     <div id="Player4Name" class="data-text">COM4</div>
@@ -194,6 +191,10 @@
         </div>
     </div>
 
+    <div id="SideInfo">
+        <div>Sidebar stuff</div>
+    </div>
+
 </body>
 <style>
 
@@ -217,7 +218,6 @@
     let Team2ScoreDiv = null;
     let Team1SandbagsDiv = null;
     let Team2SandbagsDiv = null;
-    let SpadeLogoDiv = null;
     let dealerIndex = null;
     let players = [];
     let currentBidCount = 0; // Once this is higher than 3, bidding is no longer active
@@ -316,6 +316,19 @@
             if (val !== undefined) {
                 this._element.value = val;
             }
+            this._element.addEventListener('mouseover', function (e) {
+                e.preventDefault();
+                let tempDiv = new HtmlDiv("SideInfo");
+                tempDiv.setInnerHtml(this._element.value);
+                tempDiv.showBlock();
+            }.bind(this));
+
+            this._element.addEventListener('mouseout', function (e) {
+                e.preventDefault();
+                let tempDiv = new HtmlDiv("SideInfo");
+                tempDiv.setInnerHtml("");
+                tempDiv.hide();
+            }.bind(this));
         }
 
         hide() {
@@ -493,7 +506,6 @@
             cardsPlayedThisRound++;
             if (spadesBrokenThisGame === false && card._suit === Suit.Spade) {
                 spadesBrokenThisGame = true;
-                SpadeLogoDiv.showInlineBlock();
             }
             currentPlayedCards[currentPlayerTurn] = card;
 
@@ -1020,15 +1032,6 @@
             }
             return false;
         }
-
-        onlySpadesLeftToPlay() {
-            if (this._cards[Suit.Heart].length === 0 && this._cards[Suit.Club].length === 0 && this._cards[Suit.Diamond].length === 0) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
     }
 
     class Scoreboard {
@@ -1214,7 +1217,6 @@
         Team2ScoreDiv = new HtmlDiv("Team2Score");
         Team1SandbagsDiv = new HtmlDiv("Team1Sandbags");
         Team2SandbagsDiv = new HtmlDiv("Team2Sandbags");
-        SpadeLogoDiv = new HtmlDiv("SpadeLogo");
         scoreboardModal = new Scoreboard();
         scoreboardModal.hideAllConditionalDetails();
         handlingPlayerClick = false;
@@ -1341,11 +1343,9 @@
         }
         let selectedCard = Player1CardsWithInputs[cardId]._card;
         if (currentRoundSuit === null && selectedCard._suit === Suit.Spade && spadesBrokenThisGame === false) {
-            if (player1.onlySpadesLeftToPlay() === false) {
-                alert("Spades have not been broken this game!");
-                handlingPlayerClick = false;
-                return;
-            }
+            alert("Spades have not been broken this game!");
+            handlingPlayerClick = false;
+            return;
         }
         if (currentRoundSuit !== null && selectedCard._suit !== currentRoundSuit) {
             if (player1._cards[currentRoundSuit].length > 0) {
@@ -1590,7 +1590,6 @@
     function startNewRound() {
         handlingPlayerClick = false;
         spadesBrokenThisGame = false;
-        SpadeLogoDiv.hide();
         currentPlayedCards = [null, null, null, null];
         cardsPlayedThisRound = 0;
         highestCurrentRoundCard = null;
@@ -1666,6 +1665,16 @@
     document.getElementById("PlayerBidInput").addEventListener('keyup', function (event) { playerBidKeyupHandler(event) });
     document.getElementById("PlayerBidSubmit").addEventListener('click', function () { submitBid() });
     document.getElementById("ModalContinue").addEventListener('click', function () { closeScoreboardModal() });
+
+    document.getElementById("playerCard0").addEventListener('mouseover', function(e) {
+        e.preventDefault();
+        document.getElementById("SideInfo").style.display = "block";
+    });
+
+    document.getElementById("playerCard0").addEventListener('mouseout', function(e) {
+        e.preventDefault();
+        document.getElementById("SideInfo").style.display = "none";
+    });
 
     // Main game:
     startGame();

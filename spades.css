@@ -82,6 +82,19 @@
     margin-right: 5px;
 }
 
+#SideInfo {
+    display: none;
+    height: 100%;
+    width: 400px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: #121212;
+    overflow-x: hidden;
+    opacity: 0.8;
+}
+
 #ScoreboardModal {
     display: none;
     position: fixed;
