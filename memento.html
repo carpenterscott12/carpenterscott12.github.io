@@ -2,6 +2,7 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="shared.css" />
+    <link rel="stylesheet" type="text/css" href="memento.css" />
 </head>
 
 <body>
@@ -140,9 +141,13 @@
     }
 
     class Card {
-        constructor(rank, suit) {
+        constructor(rank, suit, ownerIndex) {
             this._rank = rank;
             this._suit = suit;
+            // ownerIndex is an optional param
+            if (ownerIndex !== undefined) {
+                this._ownerIndex = ownerIndex;
+            }
         }
 
         getString() {
@@ -155,6 +160,22 @@
 
         isBlack() {
             return (this._suit === Suit.Spade || this._suit === Suit.Club);
+        }
+
+        isSpade() {
+            return (this._suit === Suit.Spade);
+        }
+
+        isHeart() {
+            return (this._suit === Suit.Heart);
+        }
+
+        isClub() {
+            return (this._suit === Suit.Club);
+        }
+
+        isDiamond() {
+            return (this._suit === Suit.Diamond);
         }
     }
 
@@ -194,7 +215,88 @@
         }
     }
 
+    class Player {
+        constructor() {
+            this._deck = new Deck();
+            this._hand = [];
+            this._shields = [];
+            this.drawCards(5);
+            this.setShields(5);
+            this._manaZone = new ManaZone();
+        }
 
+        drawCards(cardCount) {
+            let i = 0;
+            for (i = 0; i < cardCount; i++) {
+                let drawnCard = this._deck.draw();
+                if (drawnCard !== null) {
+                    this._hand.push(drawnCard);
+                }
+                else {
+                    console.log("Drawn card was null in drawFive");
+                }
+            }
+        }
+
+        setShields(shieldCount) {
+            let i = 0;
+            for (i = 0; i < shieldCount; i++) {
+                let drawnCard = this._deck.draw();
+                if (drawnCard !== null) {
+                    this._shields.push(drawnCard);
+                }
+                else {
+                    console.log("Drawn card was null in setShields");
+                }
+            }
+        }
+    }
+
+    class ManaZone {
+        constructor() {
+            this._totalMana = [[], [], [], []];
+            this._availableMana = [[], [], [], []];
+        }
+
+        addMana(suitIndex, count) {
+            this._totalMana[suit] += count;
+            this._availableMana[suit] += count;
+        }
+
+        spendMana(suitsArray) {
+            if (this._totalMana[Suit.Spade] < suitsArray[Suit.Spade]) {
+                console.log("Not enough spades mana");
+            }
+            else {
+                this._totalMana[Suit.Spade] -= suitsArray[Suit.Spade];
+            }
+            if (this._totalMana[Suit.Heart] < suitsArray[Suit.Heart]) {
+                console.log("Not enough hearts mana");
+            }
+            else {
+                this._totalMana[Suit.Heart] -= suitsArray[Suit.Heart];
+            }
+            if (this._totalMana[Suit.Club] < suitsArray[Suit.Club]) {
+                console.log("Not enough clubs mana");
+            }
+            else {
+                this._totalMana[Suit.Club] -= suitsArray[Suit.Club];
+            }
+            if (this._totalMana[Suit.Diamond] < suitsArray[Suit.Diamond]) {
+                console.log("Not enough diamonds mana");
+            }
+            else {
+                this._totalMana[Suit.Diamond] -= suitsArray[Suit.Diamond];
+            }
+        }
+
+        restoreAllMana() {
+            this._availableMana[Suit.Spade] = this._totalMana[Suit.Spade];
+            this._availableMana[Suit.Heart] = this._totalMana[Suit.Heart];
+            this._availableMana[Suit.Club] = this._totalMana[Suit.Club];
+            this._availableMana[Suit.Diamond] = this._totalMana[Suit.Diamond];
+        }
+    }
 
     function startGame() {
         
