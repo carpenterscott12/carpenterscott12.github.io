@@ -14,9 +14,11 @@
 </style>
 
 <script>
-
     // Globals
-    let deck = null;
+    let playerArray = [];
+    let currentPlayerTurn = null;
+    let endGame = false;
+    
     
 
     // There should not be a reason to access index 0 or 1, but other indices correspond to card ranks in order of strength.
@@ -220,9 +222,9 @@
             this._deck = new Deck();
             this._hand = [];
             this._shields = [];
+            this._manaZone = new ManaZone();
             this.drawCards(5);
             this.setShields(5);
-            this._manaZone = new ManaZone();
         }
 
         drawCards(cardCount) {
@@ -247,6 +249,23 @@
                 }
                 else {
                     console.log("Drawn card was null in setShields");
+                }
+            }
+        }
+
+        addCardToMana(card) {
+            this._manaZone.addMana(card._suit, 1);
+            removeCardFromHandIfExists(card);
+        }
+
+        removeCardFromHandIfExists(card) {
+            if (this._hand.length > 0) {
+                let cardIndex = this._hand.findIndex(findCard => findCard._rank === card._rank && findCard._suit === card._suit);
+                if (cardIndex > -1) {
+                    this._hand.splice(cardIndex, 1);
+                }
+                else {
+                    console.log("Card to find did not exist in the player's hand");
                 }
             }
         }
@@ -298,8 +317,20 @@
         }
     }
 
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function startGame() {
-        
+        let player1 = new Player();
+        let player2 = new Player();
+        playerArray = [];
+        playerArray.push(player1);
+        playerArray.push(player2);
+        endGame = false;
+        currentPlayerTurn = getRandomIntInclusive(0, 1);
     }
 
     function resetGame() {
