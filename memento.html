@@ -192,10 +192,11 @@
                 htmlInputObject.setColorBlack();
             }
             htmlInputObject.setTypeButton();
-            this._childElements.push(htmlInputObject);
+            let cardWithHtmlInput = new CardWithHtmlInput(card, htmlInputObject);
+            this._childElements.push(cardWithHtmlInput);
         }
 
-        addCardFaceDown() {
+        addCardFaceDown(card) {
             let node = document.createElement("input");
             node.id = "" + "id" + appendIdNumber;
             // Always increment this so that ids do not overlap. It would be nice to use a GUID for the ID, but for now this will do.
@@ -204,7 +205,8 @@
             let htmlInputObject = new HtmlInput(node.id);
             htmlInputObject.setClassName("face-down-card");
             htmlInputObject.setTypeButton();
-            this._childElements.push(htmlInputObject);
+            let cardWithHtmlInput = new CardWithHtmlInput(card, htmlInputObject);
+            this._childElements.push(cardWithHtmlInput);
         }
     }
 
@@ -212,12 +214,6 @@
         constructor(card, htmlInput) {
             this._card = card;
             this._htmlInput = htmlInput;
-            this._htmlInput.showInlineBlock();
-            this._handlingClick = false;
-        }
-
-        setHandlingClick(input) {
-            this._handlingClick = input;
         }
     }
 
@@ -297,11 +293,12 @@
     }
 
     class Player {
-        constructor() {
+        constructor(manaZoneId) {
             this._deck = new Deck();
             this._hand = [];
+            this._handZone = new Zone();
             this._shields = [];
-            this._manaZone = new ManaZone();
+            this._manaZone = new ManaZone(manaZoneId);
             this.drawCards(5);
             this.setShields(5);
         }
@@ -351,7 +348,8 @@
     }
 
     class ManaZone {
-        constructor() {
+        constructor(divId) {
+            this._divElement = new HtmlDiv(divId);
             this._totalMana = [[], [], [], []];
             this._availableMana = [[], [], [], []];
         }
@@ -403,8 +401,8 @@
     }
 
     function startGame() {
-        let player1 = new Player();
-        let player2 = new Player();
+        let player1 = new Player("PlayerManaZone");
+        let player2 = new Player("OpponentManaZone");
         playerArray = [];
         playerArray.push(player1);
         playerArray.push(player2);
