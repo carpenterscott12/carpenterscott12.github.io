@@ -6,8 +6,32 @@
 </head>
 
 <body>
-    
+    <div id="GameContainer">
+        <div id="OpponentHand" class="zone">
 
+        </div>
+        <div id="OpponentManaZone" class="zone">
+
+        </div>
+        <div id="OpponentShieldsAndDeck" class="zone">
+
+        </div>
+        <div id="OpponentCreatureZone" class="zone">
+
+        </div>
+        <div id="PlayerCreatureZone" class="zone">
+
+        </div>
+        <div id="PlayerShieldsAndDeck" class="zone">
+
+        </div>
+        <div id="PlayerManaZone" class="zone">
+
+        </div>
+        <div id="PlayerHand" class="zone">
+
+        </div>
+    </div>
 </body>
 <style>
 
@@ -18,6 +42,7 @@
     let playerArray = [];
     let currentPlayerTurn = null;
     let endGame = false;
+    let appendIdNumber = 0;
     
     
 
@@ -88,6 +113,10 @@
         setClassName(inputClassName) {
             this._element.className = inputClassName;
         }
+
+        appendNode(node) {
+            this._element.appendChild(node);
+        }
     }
 
     class HtmlInput {
@@ -126,6 +155,56 @@
 
         setColorBlack() {
             this._element.style.color = "black";
+        }
+
+        setBackgroundWhite() {
+            this._element.style.backgroundColor = "#FFFFFF";
+        }
+
+        setTypeButton() {
+            this._element.type = "button";
+        }
+
+        setClassName(inputClassName) {
+            this._element.className = inputClassName;
+        }
+    }
+
+    class Zone {
+        constructor(divId) {
+            this._htmlDiv = new HtmlDiv(divId);
+            this._childElements = [];
+        }
+
+        addCardFaceUp(card) {
+            let node = document.createElement("input");
+            node.id = "" + card._suit + card._rank + "id" + appendIdNumber;
+            // Always increment this so that ids do not overlap. It would be nice to use a GUID for the ID, but for now this will do.
+            appendIdNumber++;
+            this._htmlDiv.appendNode(node);
+            let htmlInputObject = new HtmlInput(node.id);
+            htmlInputObject.setClassName("player-hand-card");
+            htmlInputObject.setValue(card.getString());
+            if (card.isRed()) {
+                htmlInputObject.setColorRed();
+            }
+            else if (card.isBlack()) {
+                htmlInputObject.setColorBlack();
+            }
+            htmlInputObject.setTypeButton();
+            this._childElements.push(htmlInputObject);
+        }
+
+        addCardFaceDown() {
+            let node = document.createElement("input");
+            node.id = "" + "id" + appendIdNumber;
+            // Always increment this so that ids do not overlap. It would be nice to use a GUID for the ID, but for now this will do.
+            appendIdNumber++;
+            this._htmlDiv.appendNode(node);
+            let htmlInputObject = new HtmlInput(node.id);
+            htmlInputObject.setClassName("face-down-card");
+            htmlInputObject.setTypeButton();
+            this._childElements.push(htmlInputObject);
         }
     }
 
@@ -331,6 +410,28 @@
         playerArray.push(player2);
         endGame = false;
         currentPlayerTurn = getRandomIntInclusive(0, 1);
+        let playerHand = new Zone("PlayerHand");
+        let i = 0;
+        for (i = 0; i < player1._hand.length; i++) {
+            playerHand.addCardFaceUp(player1._hand[i]);
+        }
+        let opponentHand = new Zone("OpponentHand");
+        i = 0;
+        for (i = 0; i < player2._hand.length; i++) {
+            opponentHand.addCardFaceDown();
+        }
+
+        let playerShields = new Zone("PlayerShieldsAndDeck");
+        i = 0;
+        for (i = 0; i < player1._hand.length; i++) {
+            playerShields.addCardFaceDown();
+        }
+
+        let opponentShields = new Zone("OpponentShieldsAndDeck");
+        i = 0;
+        for (i = 0; i < player2._hand.length; i++) {
+            opponentShields.addCardFaceDown();
+        }
     }
 
     function resetGame() {
