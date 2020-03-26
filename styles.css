@@ -32,6 +32,10 @@
     background-color: #BB86FC;
     border-radius: 4px;
     border: 0px;
+    text-decoration: none;
+}
+.game-link:hover {
+    text-shadow: 2px 2px 4px #323232;
 }
 .letter-button {
     display: none;
