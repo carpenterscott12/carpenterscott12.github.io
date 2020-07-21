@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="shared.css" />
+    <link rel="stylesheet" type="text/css" href="stadium.css" />
+</head>
+
+<body>
+    
+</body>
+<style>
+
+</style>
+
+<script>
+
+    const types = ["rock", "paper", "scissors"];
+    const operators = ["add", "multiply"];
+
+    class Fighter {
+        constructor() {
+            this._type = type;
+            this._hp = hp;
+            this._attack = attack;
+            this._defense = defense;
+            this._magicAttack = magicAttack;
+            this._magicDefense = magicDefense;
+            this._speed = speed;
+            this._moves = [move1, move2, move3, move4]
+        }
+    }
+
+    class FighterMove {
+        constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus, 
+            chanceToInflictStatus, targetsSelf, targetsBothOpponents, targetsAllFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
+            changeStatsOnNextHit, statsToChange) {
+            this._name = name;
+            this._type = type;
+            this._damageCategory = damageCategory;
+            this._power = power;
+            this._accuracy = accuracy;
+            this._affectedByAccuracy = affectedByAccuracy;
+            this._causesDamageDirectly = causesDamageDirectly;
+            this._inflictsStatus = inflictsStatus;
+            this._chanceToInflictStatus = chanceToInflictStatus;
+            this._targetsSelf = targetsSelf;
+            this._targetsBothOpponents = targetsBothOpponents;
+            this._targetsAllFighters = targetsAllFighters;
+            this._changesStatsWhenUsed = changesStatsWhenUsed;
+            this._halvesDamageToSelfOnNextHit = halvesDamageToSelfOnNextHit;
+            this._changeStatsOnNextHit = changeStatsOnNextHit;
+            this._statsToChange = statsToChange;
+        }
+    }
+
+    class StatChanges {
+        constructor() {
+            this._hp = hp;
+            this._hpOperator = hpOperator;
+            this._attack = attack;
+            this._attackOperator = attackOperator;
+            this._defense = defense;
+            this._defenseOperator = defenseOperator;
+            this._magicAttack = magicAttack;
+            this._magicAttackOperator = magicAttackOperator;
+            this._magicDefense = magicDefense;
+            this._magicDefenseOperator = magicDefenseOperator;
+            this._speed = speed;
+            this._speedOperator = speedOperator;
+        }
+    }
+
+    class Player {
+        constructor(name) {
+            this._name = name;
+        }
+    }
+
+
+    // Main game:
+    startGame();
+
+
+</script>
+
+</html>
