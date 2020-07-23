@@ -15,10 +15,14 @@
 <script>
 
     const types = ["rock", "paper", "scissors"];
+    const damageCategories = ["a", "m"];
+    const statusConditions = ["poison", "slowed"];
     const operators = ["add", "multiply"];
+    const maxStatDelta = 6;
 
     class Fighter {
-        constructor() {
+        constructor(name, type, hp, attack, defense, magicAttack, magicDefense, speed, moves) {
+            this._name = name;
             this._type = type;
             this._hp = hp;
             this._attack = attack;
@@ -26,13 +30,20 @@
             this._magicAttack = magicAttack;
             this._magicDefense = magicDefense;
             this._speed = speed;
-            this._moves = [move1, move2, move3, move4]
+            this._moves = moves;
+            this._deltaAttack = 0;
+            this._deltaDefense = 0;
+            this._deltaMagicAttack = 0;
+            this._deltaMagicDefense = 0;
+            this._deltaSpeed = 0;
+            this._isPoisoned = false;
+            this._isSlowed = false;
         }
     }
 
     class FighterMove {
         constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus, 
-            chanceToInflictStatus, targetsSelf, targetsBothOpponents, targetsAllFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
+            chanceToInflictStatus, statusToInflict, targetsSelf, targetsBothOpponents, targetsAllFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
             changeStatsOnNextHit, statsToChange) {
             this._name = name;
             this._type = type;
@@ -43,6 +54,7 @@
             this._causesDamageDirectly = causesDamageDirectly;
             this._inflictsStatus = inflictsStatus;
             this._chanceToInflictStatus = chanceToInflictStatus;
+            this._statusToInflict = statusToInflict;
             this._targetsSelf = targetsSelf;
             this._targetsBothOpponents = targetsBothOpponents;
             this._targetsAllFighters = targetsAllFighters;
@@ -56,17 +68,11 @@
     class StatChanges {
         constructor() {
             this._hp = hp;
-            this._hpOperator = hpOperator;
             this._attack = attack;
-            this._attackOperator = attackOperator;
             this._defense = defense;
-            this._defenseOperator = defenseOperator;
             this._magicAttack = magicAttack;
-            this._magicAttackOperator = magicAttackOperator;
             this._magicDefense = magicDefense;
-            this._magicDefenseOperator = magicDefenseOperator;
             this._speed = speed;
-            this._speedOperator = speedOperator;
         }
     }
 
@@ -74,6 +80,15 @@
         constructor(name) {
             this._name = name;
         }
+    }
+
+    function startGame() {
+        let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false, false, false, false, null);
+        let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false, false, false, false, null);
+        let fighter_kyle = new Fighter("Kyle Blastar", "rock", 100, 120, 80, 100, 120, 80, [move_heavyPunch]);
+        console.log(fighter_kyle);
+        let fighter_matt = new Fighter("Matt", "scissors", 100, 100, 100, 100, 100, 100, [move_poisonBlade]);
+        console.log(fighter_matt);
     }
 
 
