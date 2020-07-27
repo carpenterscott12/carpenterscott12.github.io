@@ -19,6 +19,7 @@
     const statusConditions = ["poison", "slowed"];
     const operators = ["add", "multiply"];
     const maxStatDelta = 6;
+    const maxNumberOfMoves = 3;
 
     class Fighter {
         constructor(name, type, hp, attack, defense, magicAttack, magicDefense, speed, moves) {
@@ -39,11 +40,62 @@
             this._isPoisoned = false;
             this._isSlowed = false;
         }
+        
+        useMove(moveIndex, target) {
+            if (moveIndex >= maxNumberOfMoves) {
+                console.log("Error: move index out of bounds!");
+            }
+            else {
+                let move = this._moves[moveIndex];
+                if (move._affectedByAccuracy) {
+                    if (move._accuracy < 100) {
+                        let accuracyRoll = getRandomIntInclusive(1, 100);
+                        if (accuracyRoll > move._accuracy) {
+                            console.log("The move missed!");
+                            // TODO: conclude the move usage
+                            return;
+                        }
+                        else {
+                            if (move._causesDamageDirectly) {
+                                // TODO: damage calcs
+                            }
+                            else if (move._inflictsStatus) {
+                                if (move._statusToInflict) {
+                                    if (move._targetsSelf) {
+                                        // TODO: Inflict status on self
+                                    }
+                                    else if (move._targetsBothOpponents) {
+                                        // TODO: Inflict status on both opponents
+                                    }
+                                    else if (move._targetsAllOtherFighters) {
+                                        // TODO: Inflict status on all other fighters
+                                    }
+                                    else {
+                                        // TODO: Inflict status on the selected target
+                                    }
+                                }
+                                else {
+                                    console.log("Error: the move tried to inflict status, but it did not have a valid value for statusToInflict");
+                                }
+                            }
+                            else if (move._changesStatsWhenUsed) {
+
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (move._causesDamageDirectly) {
+                        // TODO: damage calcs
+                    }
+                }
+            }
+        }
     }
 
     class FighterMove {
         constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus, 
-            chanceToInflictStatus, statusToInflict, targetsSelf, targetsBothOpponents, targetsAllFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
+            chanceToInflictStatus, statusToInflict, targetsSelf, targetsBothOpponents, targetsAllOtherFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
             changeStatsOnNextHit, statsToChange) {
             this._name = name;
             this._type = type;
@@ -57,11 +109,27 @@
             this._statusToInflict = statusToInflict;
             this._targetsSelf = targetsSelf;
             this._targetsBothOpponents = targetsBothOpponents;
-            this._targetsAllFighters = targetsAllFighters;
+            this._targetsAllOtherFighters = targetsAllOtherFighters;
             this._changesStatsWhenUsed = changesStatsWhenUsed;
             this._halvesDamageToSelfOnNextHit = halvesDamageToSelfOnNextHit;
             this._changeStatsOnNextHit = changeStatsOnNextHit;
             this._statsToChange = statsToChange;
+        }
+
+        resolveTargets() {
+            let targets = [];
+            if (this._targetsSelf) {
+                // TODO: Inflict status on self
+            }
+            else if (this._targetsBothOpponents) {
+                // TODO: Inflict status on both opponents
+            }
+            else if (this._targetsAllOtherFighters) {
+                // TODO: Inflict status on all other fighters
+            }
+            else {
+                // TODO: Inflict status on the selected target
+            }
         }
     }
 
@@ -80,6 +148,12 @@
         constructor(name) {
             this._name = name;
         }
+    }
+
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function startGame() {
