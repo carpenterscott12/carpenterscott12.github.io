@@ -22,16 +22,17 @@
     const maxNumberOfMoves = 3;
 
     class Fighter {
-        constructor(name, type, hp, attack, defense, magicAttack, magicDefense, speed, moves) {
+        constructor(name, type, maxHp, attack, defense, magicAttack, magicDefense, speed, moves) {
             this._name = name;
             this._type = type;
-            this._hp = hp;
+            this._maxHp = maxHp;
             this._attack = attack;
             this._defense = defense;
             this._magicAttack = magicAttack;
             this._magicDefense = magicDefense;
             this._speed = speed;
             this._moves = moves;
+            this._currentHp = this._maxHp;
             this._deltaAttack = 0;
             this._deltaDefense = 0;
             this._deltaMagicAttack = 0;
@@ -58,6 +59,19 @@
                         else {
                             if (move._causesDamageDirectly) {
                                 // TODO: damage calcs
+                                if (move._targetsSelf) {
+                                    // TODO: Damage self
+                                }
+                                else if (move._targetsBothOpponents) {
+                                    // TODO: Damage both opponents
+                                }
+                                else if (move._targetsAllOtherFighters) {
+                                    // TODO: Damage all other fighters
+                                }
+                                else {
+                                    // TODO: Damage the selected target
+                                    let damage = calculateDamageToSingleTarget(this, target, move);
+                                }
                             }
                             else if (move._inflictsStatus) {
                                 if (move._statusToInflict) {
@@ -72,14 +86,46 @@
                                     }
                                     else {
                                         // TODO: Inflict status on the selected target
+                                        if (hasStatusCondition(target)) {
+                                            // TODO: Show a message saying the target already has a status condition
+                                        }
+                                        else {
+                                            if (move._statusToInflict == "poison") {
+                                                target._isPoisoned = true;
+                                            }
+                                            else if (move._statusToInflict == "slowed") {
+                                                target._isSlowed = true;
+                                            }
+                                            else {
+                                                console.log("The status to inflict was not 'poison' or 'slowed'. No status was applied to the target fighter.");
+                                            }
+                                        }
                                     }
                                 }
                                 else {
-                                    console.log("Error: the move tried to inflict status, but it did not have a valid value for statusToInflict");
+                                    console.log("Error: the move tried to inflict status, but statusToInflict was null or undefined");
                                 }
                             }
                             else if (move._changesStatsWhenUsed) {
-
+                                // It's okay to assume that HP is truthy if it needs to be applied. If it is 0, then there is no change to apply.
+                                if (move._statChanges._hp) {
+                                    // TODO: Calculate HP change
+                                }
+                                if (move._statChanges._attack) {
+                                    // TODO: Calculate attack change
+                                }
+                                if (move._statChanges._defense) {
+                                    // TODO: Calculate defense change
+                                }
+                                if (move._statChanges._magicAttack) {
+                                    // TODO: Calculate magicAttack change
+                                }
+                                if (move._statChanges._magicDefense) {
+                                    // TODO: Calculate magicDefense change
+                                }
+                                if (move._statChanges._speed) {
+                                    // TODO: Calculate speed change
+                                }
                             }
                         }
                     }
@@ -96,7 +142,7 @@
     class FighterMove {
         constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus, 
             chanceToInflictStatus, statusToInflict, targetsSelf, targetsBothOpponents, targetsAllOtherFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
-            changeStatsOnNextHit, statsToChange) {
+            changeStatsOnNextHit, statChanges) {
             this._name = name;
             this._type = type;
             this._damageCategory = damageCategory;
@@ -113,7 +159,7 @@
             this._changesStatsWhenUsed = changesStatsWhenUsed;
             this._halvesDamageToSelfOnNextHit = halvesDamageToSelfOnNextHit;
             this._changeStatsOnNextHit = changeStatsOnNextHit;
-            this._statsToChange = statsToChange;
+            this._statChanges = statChanges;
         }
 
         resolveTargets() {
@@ -134,9 +180,9 @@
     }
 
     class StatChanges {
-        constructor() {
-            this._hp = hp;
-            this._attack = attack;
+        constructor(hp, attack, defense, magicAttack, magicDefense, speed) {
+            this._hp = hp; // Integer, can be any size and can be positive or negative
+            this._attack = attack; // Integer, can be positive or negative, but absolute value cannot exceed the value of maxStatDelta
             this._defense = defense;
             this._magicAttack = magicAttack;
             this._magicDefense = magicDefense;
@@ -154,6 +200,115 @@
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function calculateDamageToSingleTarget(attacker, defender, move) {
+        let attackOverDefense = null;
+        
+        if (move._damageCategory == "a") {
+            attackOverDefense = (attacker._attack * attacker._deltaAttack) / (defender._defense * defender._deltaDefense);
+        }
+        else if (move._damageCategory == "m") {
+            attackOverDefense = (attacker._magicAttack * attacker._deltaMagicAttack) / (defender._magicDefense * defender._deltaMagicDefense);
+        }
+        else {
+            console.log("The move's damage category was invalid");
+        }
+
+        let typeResistanceMultiplier = getTypeResistanceMultiplier(move._type, defender._type);
+        let sameTypeAttackBonus = 1;
+        if (attacker._type == move._type) {
+            sameTypeAttackBonus = 1.5;
+        }
+
+        let randomValue = getRandomIntInclusive(85, 100) * 0.01;
+
+        let damage = attackOverDefense * move._power * sameTypeAttackBonus * randomValue * typeResistanceMultiplier;
+        if (damage < 1) {
+            return 1;
+        }
+        else {
+            return Math.round(damage);
+        }
+    }
+
+    function getTypeResistanceMultiplier(attackingMoveType, defenderType) {
+        if (attackingMoveType == defenderType) {
+            return 1;
+        }
+        if (attackingMoveType == "rock") {
+            if (defenderType == "paper") {
+                return 0.5;
+            }
+            else if (defenderType == "scissors") {
+                return 2;
+            }
+            else {
+                console.log("Invalid type for defender");
+            }
+        }
+        else if (attackingMoveType == "paper") {
+            if (defenderType == "scissors") {
+                return 0.5;
+            }
+            else if (defenderType == "rock") {
+                return 2;
+            }
+            else {
+                console.log("Invalid type for defender");
+            }
+        }
+        else if (attackingMoveType == "scissors") {
+            if (defenderType == "rock") {
+                return 0.5;
+            }
+            else if (defenderType == "paper") {
+                return 2;
+            }
+            else {
+                console.log("Invalid type for defender");
+            }
+        }
+        else {
+            console.log("Invalid type for attacker");
+        }
+    }
+
+    function hasStatusCondition(fighter) {
+        if (fighter._isSlowed || fighter._isPoisoned) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function statCannotIncreaseFurther(statChange, currentStatValue, maxStat) {
+        if (statChange <= 0) {
+            return false;
+        }
+        else {
+            if (Math.abs(statChange + currentStatValue) > maxStat) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    function statCannotDecreaseFurther(statChange, currentStatValue, maxStat) {
+        if (statChange >= 0) {
+            return false;
+        }
+        else {
+            if (Math.abs(currentStatValue - statChange) > maxStat) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     }
 
     function startGame() {
