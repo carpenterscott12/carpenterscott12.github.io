@@ -6,7 +6,142 @@
 </head>
 
 <body>
+    <div id="MainMenu">
+        <div>Main Menu</div>
+        <div>Create or modify your teams of fighters:</div>
+        <input type="button" value="Team 1" />
+        <input type="button" value="Team 2" />
+        <input type="button" value="Team 3" />
+        <input type="button" value="Team 4" />
+        <div>Choose the tournament to participate in:</div>
+        <input type="button" value="Power" />
+        <input type="button" value="Stat Changes" />
+        <input type="button" value="Status Conditions" />
+    </div>
+    <div id="TeamEditor" style="display: none">
+        <div id="TeamEditorFighterList">
+            <div id="TeamEditorTeamNameContainer">
+                <div>Team Name:</div>
+                <input type="text" />
+            </div>
+            <div>
+                <div id="Fighter1Name">Fighter 1</div>
+                <input type="button" value="Edit" />
+            </div>
+            <div>
+                <div id="Fighter1Name">Fighter 2</div>
+                <input type="button" value="Edit" />
+            </div>
+            <div>
+                <div id="Fighter1Name">Fighter 3</div>
+                <input type="button" value="Edit" />
+            </div>
+            <div>
+                <div id="Fighter1Name">Fighter 4</div>
+                <input type="button" value="Edit" />
+            </div>
+            <div>
+                <div id="Fighter1Name">Fighter 5</div>
+                <input type="button" value="Edit" />
+            </div>
+            <div>
+                <div id="Fighter1Name">Fighter 6</div>
+                <input type="button" value="Edit" />
+            </div>
+            <div id="TeamEditorSaveAndCancelButtons">
+                <input type="button" value="Save Changes" />
+                <input type="button" value="Cancel Changes" />
+            </div>
+        </div>
+        <div id="FighterEditor" style="display: none">
+            <div>Select Move 1:</div>
+            <select id="move1Select">
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+            </select>
+            <div>Select Move 2:</div>
+            <select id="move2Select">
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+            </select>
+            <div>Select Move 3:</div>
+            <select id="move3Select">
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+            </select>
+            <div id="FighterEditorSaveAndCancelButtons">
+                <input type="button" value="Save Changes" />
+                <input type="button" value="Cancel Changes" />
+            </div>
+        </div>
+    </div>
+    <div id="FightLayout" style="display: none">
+        <div id="PrimaryFightLayout">
+            <div id="EnemyFighterInfo">
+                <img src="stadium/images/fighters/Tom.png" />
+                <div>Enemy Fighter: </div>
+                <div id="EnemyFighterName">EnemyFighterName</div>
+            </div>
+            <div>
+                <div>HP</div>
+                <div id="EnemyRemainingHP"></div>
+                <div>/</div>
+                <div id="EnemyMaximumHP"></div>
+            </div>
     
+            <div id="PlayerFighterInfo">
+                <img src="stadium/images/fighters/Matt.png" />
+                <div>Your Fighter: </div>
+                <div id="PlayerFighterName">PlayerFighterName</div>
+            </div>
+            <div>
+                <div>HP</div>
+                <div id="PlayerRemainingHP"></div>
+                <div>/</div>
+                <div id="PlayerMaximumHP"></div>
+            </div>
+            <input type="button" value="Move 1"/>
+            <input type="button" value="Move 2"/>
+            <input type="button" value="Move 3"/>
+            <input type="button" value="Swap Fighters" />
+        </div>
+        <div id="SwapFightersLayout" style="display: none">
+            <div id="SwapFighter1Group">
+                <img src="stadium/images/fighters/Matt.png" />
+                <div id="SwapFighter1Name">Fighter 1</div>
+                <input type="button" value="Select" />
+            </div>
+            <div id="SwapFighter2Group">
+                <img src="stadium/images/fighters/Tom.png" />
+                <div id="SwapFighter2Name">Fighter 2</div>
+                <input type="button" value="Select" />
+            </div>
+            <div id="SwapFighter3Group">
+                <img src="stadium/images/fighters/Ryan.png" />
+                <div id="SwapFighter3Name">Fighter 3</div>
+                <input type="button" value="Select" />
+            </div>
+            <div id="SwapFighter4Group">
+                <img src="stadium/images/fighters/Baldoo.png" />
+                <div id="SwapFighter4Name">Fighter 4</div>
+                <input type="button" value="Select" />
+            </div>
+            <div id="SwapFighter5Group">
+                <img src="stadium/images/fighters/Baldao.png" />
+                <div id="SwapFighter5Name">Fighter 5</div>
+                <input type="button" value="Select" />
+            </div>
+            <div id="SwapFighter6Group">
+                <img src="stadium/images/fighters/Elderoo.png" />
+                <div id="SwapFighter6Name">Fighter 6</div>
+                <input type="button" value="Select" />
+            </div>
+            
+        </div>
+    </div>
 </body>
 <style>
 
@@ -71,6 +206,13 @@
                                 else {
                                     // TODO: Damage the selected target
                                     let damage = calculateDamageToSingleTarget(this, target, move);
+                                    target._currentHp -= damage;
+                                    if (target._currentHp < 0) {
+                                        target._currentHp = 0;
+                                    }
+                                    if (target._currentHp == 0) {
+                                        // TODO: Handle target being defeated
+                                    }
                                 }
                             }
                             else if (move._inflictsStatus) {
@@ -160,22 +302,6 @@
             this._halvesDamageToSelfOnNextHit = halvesDamageToSelfOnNextHit;
             this._changeStatsOnNextHit = changeStatsOnNextHit;
             this._statChanges = statChanges;
-        }
-
-        resolveTargets() {
-            let targets = [];
-            if (this._targetsSelf) {
-                // TODO: Inflict status on self
-            }
-            else if (this._targetsBothOpponents) {
-                // TODO: Inflict status on both opponents
-            }
-            else if (this._targetsAllOtherFighters) {
-                // TODO: Inflict status on all other fighters
-            }
-            else {
-                // TODO: Inflict status on the selected target
-            }
         }
     }
 
