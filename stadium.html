@@ -87,11 +87,13 @@
             </div>
             <div>
                 <div>HP</div>
-                <div id="EnemyRemainingHP"></div>
+                <div id="EnemyCurrentHP"></div>
                 <div>/</div>
                 <div id="EnemyMaximumHP"></div>
+                <div id="EnemyPoisonedIndicator">*Poisoned*</div>
+                <div id="EnemySlowedIndicator">*Slowed*</div>
             </div>
-    
+
             <div id="PlayerFighterInfo">
                 <img src="stadium/images/fighters/Matt.png" />
                 <div>Your Fighter: </div>
@@ -99,13 +101,15 @@
             </div>
             <div>
                 <div>HP</div>
-                <div id="PlayerRemainingHP"></div>
+                <div id="PlayerCurrentHP"></div>
                 <div>/</div>
                 <div id="PlayerMaximumHP"></div>
+                <div id="PlayerPoisonedIndicator">*Poisoned*</div>
+                <div id="PlayerSlowedIndicator">*Slowed*</div>
             </div>
-            <input type="button" value="Move 1"/>
-            <input type="button" value="Move 2"/>
-            <input type="button" value="Move 3"/>
+            <input type="button" value="Move 1" />
+            <input type="button" value="Move 2" />
+            <input type="button" value="Move 3" />
             <input type="button" value="Swap Fighters" />
         </div>
         <div id="SwapFightersLayout" style="display: none">
@@ -139,7 +143,6 @@
                 <div id="SwapFighter6Name">Fighter 6</div>
                 <input type="button" value="Select" />
             </div>
-            
         </div>
     </div>
 </body>
@@ -155,6 +158,62 @@
     const operators = ["add", "multiply"];
     const maxStatDelta = 6;
     const maxNumberOfMoves = 3;
+    let currentPlayerFighterCurrentHp = new HtmlDiv("PlayerCurrentHP");
+    let currentPlayerFighterMaxHp = new HtmlDiv("PlayerMaximumHP");
+    let currentPlayerPoisonedIndicator = new HtmlDiv("PlayerPoisonedIndicator");
+    let currentPlayerSlowedIndicator = new HtmlDiv("PlayerSlowedIndicator");
+    let currentOpponentFighterCurrentHp = new HtmlDiv("EnemyCurrentHP");
+    let currentOpponentFighterMaxHp = new HtmlDiv("EnemyMaximumHP");
+    let currentOpponentPoisonedIndicator = new HtmlDiv("EnemyPoisonedIndicator");
+    let currentOpponentSlowedIndicator = new HtmlDiv("EnemySlowedIndicator");
+    let gameState = null;
+    
+    class GameState {
+        constructor() {
+            this._currentPlayerFighter = null; // Fighter object
+            this._currentOpponentFighter = null; // Fighter object
+            this._currentPlayerTeam = null; // Array of Fighter objects
+            this._currentOpponentTeam = null; // Array of Fighter objects
+        }
+
+        setNewCurrentPlayerFighter(newFighter) {
+            this.clearFighterHtmlElements(this._currentPlayerFighter);
+
+            this._currentPlayerFighter = newFighter;
+
+            this.setUpFighterHtmlElements(this._currentPlayerFighter, currentPlayerFighterCurrentHp, currentPlayerFighterMaxHp, currentPlayerPoisonedIndicator, currentPlayerSlowedIndicator);
+        }
+
+        setNewCurrentOpponentFighter(newFighter) {
+            this.clearFighterHtmlElements(this._currentOpponentFighter);
+
+            this._currentOpponentFighter = newFighter;
+
+            this.setUpFighterHtmlElements(this._currentOpponentFighter, currentOpponentFighterCurrentHp, currentOpponentFighterMaxHp, currentOpponentPoisonedIndicator, currentOpponentSlowedIndicator);
+        }
+
+        clearFighterHtmlElements(fighter) {
+            fighter._maxHpElement = null;
+            fighter._currentHpElement = null;
+            fighter._poisonedIndicator.hide();
+            fighter._slowedIndicator.hide();
+            fighter._poisonedIndicator = null;
+            fighter._slowedIndicator = null;
+        }
+
+        setUpFighterHtmlElements(fighter, currentHpElement, maxHpElement, poisonedIndicator, slowedIndicator) {
+            fighter._currentHpElement = currentHpElement;
+            fighter._maxHpElement = maxHpElement;
+            fighter._poisonedIndicator = poisonedIndicator;
+            fighter._slowedIndicator = slowedIndicator;
+            if (fighter._isPoisoned) {
+                fighter._poisonedIndicator.showInlineBlock();
+            }
+            if (fighter._isSlowed) {
+                fighter._slowedIndicator.showInlineBlock();
+            }
+        }
+    }
 
     class Fighter {
         constructor(name, type, maxHp, attack, defense, magicAttack, magicDefense, speed, moves) {
@@ -175,8 +234,12 @@
             this._deltaSpeed = 0;
             this._isPoisoned = false;
             this._isSlowed = false;
+            this._maxHpElement = null;
+            this._currentHpElement = null;
+            this._poisonedIndicator = null;
+            this._slowedIndicator = null;
         }
-        
+
         useMove(moveIndex, target) {
             if (moveIndex >= maxNumberOfMoves) {
                 console.log("Error: move index out of bounds!");
@@ -193,81 +256,43 @@
                         }
                         else {
                             if (move._causesDamageDirectly) {
-                                // TODO: damage calcs
-                                if (move._targetsSelf) {
-                                    // TODO: Damage self
+                                let damage = calculateDamageToSingleTarget(this, target, move);
+                                target._currentHp -= damage;
+                                if (target._currentHp < 0) {
+                                    target._currentHp = 0;
                                 }
-                                else if (move._targetsBothOpponents) {
-                                    // TODO: Damage both opponents
-                                }
-                                else if (move._targetsAllOtherFighters) {
-                                    // TODO: Damage all other fighters
-                                }
-                                else {
-                                    // TODO: Damage the selected target
-                                    let damage = calculateDamageToSingleTarget(this, target, move);
-                                    target._currentHp -= damage;
-                                    if (target._currentHp < 0) {
-                                        target._currentHp = 0;
-                                    }
-                                    if (target._currentHp == 0) {
-                                        // TODO: Handle target being defeated
-                                    }
+                                if (target._currentHp == 0) {
+                                    // TODO: Handle target being defeated
                                 }
                             }
-                            else if (move._inflictsStatus) {
+                            if (move._inflictsStatus) {
                                 if (move._statusToInflict) {
-                                    if (move._targetsSelf) {
-                                        // TODO: Inflict status on self
-                                    }
-                                    else if (move._targetsBothOpponents) {
-                                        // TODO: Inflict status on both opponents
-                                    }
-                                    else if (move._targetsAllOtherFighters) {
-                                        // TODO: Inflict status on all other fighters
+                                    if (target.hasStatusCondition()) {
+                                        // TODO: Show a message saying the target already has a status condition
                                     }
                                     else {
-                                        // TODO: Inflict status on the selected target
-                                        if (hasStatusCondition(target)) {
-                                            // TODO: Show a message saying the target already has a status condition
+                                        if (move._statusToInflict == "poison") {
+                                            target._isPoisoned = true;
+                                            target._poisonedIndicator.showInlineBlock();
+                                        }
+                                        else if (move._statusToInflict == "slowed") {
+                                            target._isSlowed = true;
+                                            target._slowedIndicator.showInlineBlock();
                                         }
                                         else {
-                                            if (move._statusToInflict == "poison") {
-                                                target._isPoisoned = true;
-                                            }
-                                            else if (move._statusToInflict == "slowed") {
-                                                target._isSlowed = true;
-                                            }
-                                            else {
-                                                console.log("The status to inflict was not 'poison' or 'slowed'. No status was applied to the target fighter.");
-                                            }
+                                            console.log("The status to inflict was not 'poison' or 'slowed'. No status was applied to the target fighter.");
                                         }
                                     }
                                 }
                                 else {
-                                    console.log("Error: the move tried to inflict status, but statusToInflict was null or undefined");
+                                    console.log("Error: the move tried to inflict status, but statusToInflict was null or undefined.");
                                 }
                             }
-                            else if (move._changesStatsWhenUsed) {
-                                // It's okay to assume that HP is truthy if it needs to be applied. If it is 0, then there is no change to apply.
-                                if (move._statChanges._hp) {
-                                    // TODO: Calculate HP change
-                                }
-                                if (move._statChanges._attack) {
-                                    // TODO: Calculate attack change
-                                }
-                                if (move._statChanges._defense) {
-                                    // TODO: Calculate defense change
-                                }
-                                if (move._statChanges._magicAttack) {
-                                    // TODO: Calculate magicAttack change
-                                }
-                                if (move._statChanges._magicDefense) {
-                                    // TODO: Calculate magicDefense change
-                                }
-                                if (move._statChanges._speed) {
-                                    // TODO: Calculate speed change
-                                }
+                            if (move._changesStatsOfSelf) {
+                                this.changeStats(move._statChanges);
+                            }
+                            if (move._changesStatsOfTarget) {
+                                target.changeStats(move._statChanges);
                             }
                         }
                     }
@@ -279,12 +304,90 @@
                 }
             }
         }
+
+        changeStats(statChanges) {
+            // It's okay to assume that HP is truthy if it needs to be applied. If it is 0, then there is no change to apply.
+            if (statChanges._hp) {
+                // TODO: Calculate HP change
+                if (this._currentHp == this._maxHp && statChanges._hp > 0) {
+                    // TODO: Say that hp was already at maximum
+                }
+                else {
+                    let oldHpValue = this._currentHp.valueOf();
+                    this._currentHp += statChanges._hp;
+                    if (this._currentHp <= this._maxHp && statChanges._hp > 0) {
+                        // TODO: Say that we healed HP equal to move_statChanges._hp
+                    }
+                    else if (this._currentHp <= 0) {
+                        // TODO: Show that this fighter has been defeated
+                    }
+                    else {
+                        let hpChange = this._currentHp - oldHpValue;
+                    }
+                }
+            }
+            if (statChanges._attack) {
+                this._deltaAttack = this.changeStat(statChanges._attack, this._deltaAttack, "attack");
+            }
+            if (statChanges._defense) {
+                this._deltaDefense = this.changeStat(statChanges._defense, this._deltaDefense, "defense");
+            }
+            if (statChanges._magicAttack) {
+                this._deltaMagicAttack = this.changeStat(statChanges._magicAttack, this._deltaMagicAttack, "magic attack");
+            }
+            if (statChanges._magicDefense) {
+                this._deltaMagicDefense = this.changeStat(statChanges._magicDefense, this._deltaMagicDefense, "magic defense");
+            }
+            if (statChanges._speed) {
+                this._deltaSpeed = this.changeStat(statChanges._speed, this._deltaSpeed, "speed");
+            }
+        }
+
+        changeStat(statChange, deltaStat, statName) {
+            if (statChange > 0) {
+                if (deltaStat >= maxStatDelta) {
+                    // TODO: Show that this stat cannot go higher
+                }
+                else if (Math.abs(deltaStat) >= maxStatDelta) {
+                    // TODO: Show that this stat cannot go lower
+                }
+                else {
+                    let oldStatValue = deltaStat;
+                    deltaStat += statChange;
+                    if (deltaStat > maxStatDelta) {
+                        let statChange = maxStatDelta - oldStatValue;
+                        // TODO: Show that this stat was increased by statChange
+                    }
+                    else if (Math.abs(deltaStat) > maxStatDelta) {
+                        let statChange = maxStatDelta - Math.abs(deltaStat);
+                        // TODO: Show that this stat was decreased by statChange
+                    }
+                    else {
+                        if (statChange > 0) {
+                            // TODO: Show that this stat was increased by statChange
+                        }
+                        else {
+                            // TODO: Show that this stat was decreased by Math.abs(statChange)
+                        }
+                    }
+                }
+            }
+            return deltaStat;
+        }
+
+        hasStatusCondition() {
+            if (this._isSlowed || this._isPoisoned) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
     }
 
     class FighterMove {
-        constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus, 
-            chanceToInflictStatus, statusToInflict, targetsSelf, targetsBothOpponents, targetsAllOtherFighters, changesStatsWhenUsed, halvesDamageToSelfOnNextHit,
-            changeStatsOnNextHit, statChanges) {
+        constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus,
+            chanceToInflictStatus, statusToInflict, changesStatsOfSelf, halvesDamageToSelfOnNextHit, changesStatsOfTarget, statChanges) {
             this._name = name;
             this._type = type;
             this._damageCategory = damageCategory;
@@ -295,12 +398,9 @@
             this._inflictsStatus = inflictsStatus;
             this._chanceToInflictStatus = chanceToInflictStatus;
             this._statusToInflict = statusToInflict;
-            this._targetsSelf = targetsSelf;
-            this._targetsBothOpponents = targetsBothOpponents;
-            this._targetsAllOtherFighters = targetsAllOtherFighters;
-            this._changesStatsWhenUsed = changesStatsWhenUsed;
+            this._changesStatsOfSelf = changesStatsOfSelf;
             this._halvesDamageToSelfOnNextHit = halvesDamageToSelfOnNextHit;
-            this._changeStatsOnNextHit = changeStatsOnNextHit;
+            this._changesStatsOfTarget = changesStatsOfTarget;
             this._statChanges = statChanges;
         }
     }
@@ -322,6 +422,53 @@
         }
     }
 
+    class HtmlDiv {
+        constructor(divId, defaultInnerHtml) {
+            this._divId = divId;
+            this._element = document.getElementById(divId);
+            // Make defaultInnerHtml optional param
+            if (defaultInnerHtml !== undefined) {
+                this._element.innerHTML = defaultInnerHtml;
+            }
+        }
+
+        hide() {
+            this._element.style.display = "none";
+        }
+
+        showBlock() {
+            this._element.style.display = "block";
+        }
+
+        showInlineBlock() {
+            this._element.style.display = "inline-block";
+        }
+
+        setInnerHtml(input) {
+            this._element.innerHTML = input;
+        }
+
+        setColorRed() {
+            this._element.style.color = "red";
+        }
+
+        setColorBlack() {
+            this._element.style.color = "black";
+        }
+
+        setColorGreen() {
+            this._element.style.color = "#03DAC6";
+        }
+
+        setColorWhite() {
+            this._element.style.color = "#FFFFFF";
+        }
+
+        setClassName(inputClassName) {
+            this._element.className = inputClassName;
+        }
+    }
+
     function getRandomIntInclusive(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -330,7 +477,7 @@
 
     function calculateDamageToSingleTarget(attacker, defender, move) {
         let attackOverDefense = null;
-        
+
         if (move._damageCategory == "a") {
             attackOverDefense = (attacker._attack * attacker._deltaAttack) / (defender._defense * defender._deltaDefense);
         }
@@ -400,15 +547,6 @@
         }
     }
 
-    function hasStatusCondition(fighter) {
-        if (fighter._isSlowed || fighter._isPoisoned) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
     function statCannotIncreaseFurther(statChange, currentStatValue, maxStat) {
         if (statChange <= 0) {
             return false;
@@ -438,12 +576,18 @@
     }
 
     function startGame() {
-        let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false, false, false, false, null);
-        let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false, false, false, false, null);
+        gameState = new GameState();
+        let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false, null);
+        let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false, null);
         let fighter_kyle = new Fighter("Kyle Blastar", "rock", 100, 120, 80, 100, 120, 80, [move_heavyPunch]);
         console.log(fighter_kyle);
         let fighter_matt = new Fighter("Matt", "scissors", 100, 100, 100, 100, 100, 100, [move_poisonBlade]);
         console.log(fighter_matt);
+        gameState._currentPlayerTeam = [fighter_kyle];
+        gameState._currentOpponentTeam = [fighter_matt];
+        gameState._currentPlayerFighter = fighter_kyle;
+        gameState._currentOpponentFighter = fighter_matt;
+        console.log(gameState);
     }
 
 
