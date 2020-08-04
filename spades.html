@@ -13,11 +13,11 @@
                 <div id="ModalTeam1Board">
                     <div id="ModalTeam1Title">Team 1:</div>
                     <div id="ModalPlayer1NilResultText">
-                        <div class="modal-scoreboard-label">Player 1 Nil Result:</div>
+                        <div class="modal-scoreboard-label">Player1 Nil Result:</div>
                         <div id="ModalPlayer1NilResultValue" class="modal-scoreboard-label">0</div>
                     </div>
                     <div id="ModalPlayer3NilResultText">
-                        <div class="modal-scoreboard-label">Player 3 Nil Result:</div>
+                        <div class="modal-scoreboard-label">Player3 Nil Result:</div>
                         <div id="ModalPlayer3NilResultValue" class="modal-scoreboard-label">0</div>
                     </div>
                     <div id="ModalTeam1BidLabel">
@@ -53,11 +53,11 @@
                 <div id="ModalTeam2Board">
                     <div id="ModalTeam2Title">Team 2:</div>
                     <div id="ModalPlayer2NilResultText">
-                        <div class="modal-scoreboard-label">Player 2 Nil Result:</div>
+                        <div class="modal-scoreboard-label">Player2 Nil Result:</div>
                         <div id="ModalPlayer2NilResultValue" class="modal-scoreboard-label">0</div>
                     </div>
                     <div id="ModalPlayer4NilResultText">
-                        <div class="modal-scoreboard-label">Player 4 Nil Result:</div>
+                        <div class="modal-scoreboard-label">Player4 Nil Result:</div>
                         <div id="ModalPlayer4NilResultValue" class="modal-scoreboard-label">0</div>
                     </div>
                     <div id="ModalTeam2BidLabel">
@@ -102,7 +102,7 @@
     <div id="GameContainer">
         <div id="ScoreArea">
             <div id="Team1NameAndScore">
-                <div id="Team1Name">Team 1 (Player1 and COM3)</div>
+                <div id="Team1Name">Team 1 (Player1 and Player3)</div>
                 <div>
                     <div class="score-area-text">Score:</div>
                     <div id="Team1Score" class="score-area-text">0</div>
@@ -117,7 +117,7 @@
                 title="The score limit determines when the game is over. If you have -150 points or fewer, you lose. If you have 250 points or more, you win.">
                 Score limit: (Min -150 / Max 250)</div>
             <div id="Team2NameAndScore">
-                <div id="Team2Name">Team 2 (COM2 and COM4)</div>
+                <div id="Team2Name">Team 2 (Player2 and Player4)</div>
                 <div>
                     <div class="score-area-text">Score:</div>
                     <div id="Team2Score" class="score-area-text">0</div>
@@ -131,7 +131,7 @@
         <div id="PlayArea">
             <div id="Player3Data">
                 <div id="Player3Card" class="play-area-card"></div>
-                <div id="Player3Name" class="data-text">COM3</div>
+                <div id="Player3Name" class="data-text">Player3</div>
                 <div id="Player3TricksToBids"
                     title="The left number is the number of tricks won. The right number is the player's bid."
                     class="data-text">
@@ -141,7 +141,7 @@
             <div id="WestAndEastCardContainer">
                 <div id="Player2Data">
                     <div id="Player2Card" class="play-area-card"></div>
-                    <div id="Player2Name" class="data-text">COM2</div>
+                    <div id="Player2Name" class="data-text">Player2</div>
                     <div id="Player2TricksToBids"
                         title="The left number is the number of tricks won. The right number is the player's bid."
                         class="data-text">
@@ -153,7 +153,7 @@
                 </div>
                 <div id="Player4Data">
                     <div id="Player4Card" class="play-area-card"></div>
-                    <div id="Player4Name" class="data-text">COM4</div>
+                    <div id="Player4Name" class="data-text">Player4</div>
                     <div id="Player4TricksToBids"
                         title="The left number is the number of tricks won. The right number is the player's bid."
                         class="data-text">
@@ -1192,9 +1192,9 @@
         // The Deck constructor should shuffle the cards, so no need to do it again here.
         deck = new Deck();
         player1 = new Player("Player1", true, "Player1");
-        player2 = new Player("COM2", false, "Player2");
-        player3 = new Player("COM3", false, "Player3");
-        player4 = new Player("COM4", false, "Player4");
+        player2 = new Player("Player2", false, "Player2");
+        player3 = new Player("Player3", false, "Player3");
+        player4 = new Player("Player4", false, "Player4");
         players.push(player1);
         players.push(player2);
         players.push(player3);
