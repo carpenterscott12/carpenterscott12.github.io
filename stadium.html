@@ -107,10 +107,11 @@
                 <div id="PlayerPoisonedIndicator">*Poisoned*</div>
                 <div id="PlayerSlowedIndicator">*Slowed*</div>
             </div>
-            <input type="button" value="Move 1" />
-            <input type="button" value="Move 2" />
-            <input type="button" value="Move 3" />
-            <input type="button" value="Swap Fighters" />
+            <input id="MoveButton1" disabled style="display: none" type="button" value="Move 1" />
+            <input id="MoveButton2" disabled style="display: none" type="button" value="Move 2" />
+            <input id="MoveButton3" disabled style="display: none" type="button" value="Move 3" />
+            <input id="SwapFightersButton" type="button" value="Swap Fighters" />
+            <div id="FightText"></div>
         </div>
         <div id="SwapFightersLayout" style="display: none">
             <div id="SwapFighter1Group">
@@ -158,60 +159,127 @@
     const operators = ["add", "multiply"];
     const maxStatDelta = 6;
     const maxNumberOfMoves = 3;
-    let currentPlayerFighterCurrentHp = new HtmlDiv("PlayerCurrentHP");
-    let currentPlayerFighterMaxHp = new HtmlDiv("PlayerMaximumHP");
-    let currentPlayerPoisonedIndicator = new HtmlDiv("PlayerPoisonedIndicator");
-    let currentPlayerSlowedIndicator = new HtmlDiv("PlayerSlowedIndicator");
-    let currentOpponentFighterCurrentHp = new HtmlDiv("EnemyCurrentHP");
-    let currentOpponentFighterMaxHp = new HtmlDiv("EnemyMaximumHP");
-    let currentOpponentPoisonedIndicator = new HtmlDiv("EnemyPoisonedIndicator");
-    let currentOpponentSlowedIndicator = new HtmlDiv("EnemySlowedIndicator");
+    const notVeryEffectiveText = "The move was not very effective.";
+    const superEffectiveText = "The move was super effective!";
+    let mainMenuElement = null;
+    let fightLayoutElement = null;
+    let currentPlayerFighterName = null;
+    let currentPlayerFighterCurrentHp = null;
+    let currentPlayerFighterMaxHp = null;
+    let currentPlayerPoisonedIndicator = null;
+    let currentPlayerSlowedIndicator = null;
+    let currentOpponentFighterName = null;
+    let currentOpponentFighterCurrentHp = null;
+    let currentOpponentFighterMaxHp = null;
+    let currentOpponentPoisonedIndicator = null;
+    let currentOpponentSlowedIndicator = null;
+    let playerMoveButton1 = null;
+    let playerMoveButton2 = null;
+    let playerMoveButton3 = null;
+    let fightText = null;
     let gameState = null;
-    
+
     class GameState {
         constructor() {
             this._currentPlayerFighter = null; // Fighter object
             this._currentOpponentFighter = null; // Fighter object
             this._currentPlayerTeam = null; // Array of Fighter objects
             this._currentOpponentTeam = null; // Array of Fighter objects
+            this._playerTurn = false;
+        }
+
+        setTurnBasedOnSpeed() {
+            let playerFighterSpeed = this._currentPlayerFighter._speed * getDeltaMultiplier(this._currentPlayerFighter._deltaSpeed);
+            let opponentFighterSpeed = this._currentOpponentFighter * getDeltaMultiplier(this._currentOpponentFighter._deltaSpeed);
+            if (playerFighterSpeed == opponentFighterSpeed) {
+                if (getRandomIntInclusive(0, 1) == 1) {
+                    this._playerTurn = true;
+                }
+                else {
+                    this._playerTurn = false;
+                }
+            }
+            this._playerTurn = this._playerTurn = playerFighterSpeed > opponentFighterSpeed;
+        }
+
+        disableButtons() {
+            playerMoveButton1.disable();
+            playerMoveButton2.disable();
+            playerMoveButton3.disable();
+        }
+
+        enableButtons(fighter) {
+            if (fighter._moves) {
+                if (fighter._moves.length > 0) {
+                    playerMoveButton1.showBlock();
+                    playerMoveButton1.enable();
+                }
+                if (fighter._moves.length > 1) {
+                    playerMoveButton2.showBlock();
+                    playerMoveButton2.enable();
+                }
+                if (fighter._moves.length > 2) {
+                    playerMoveButton3.showBlock();
+                    playerMoveButton3.enable();
+                }
+            }
         }
 
         setNewCurrentPlayerFighter(newFighter) {
-            this.clearFighterHtmlElements(this._currentPlayerFighter);
+            if (this._currentPlayerFighter) {
+                this.clearFighterHtmlElements(this._currentPlayerFighter);
+            }
 
             this._currentPlayerFighter = newFighter;
 
-            this.setUpFighterHtmlElements(this._currentPlayerFighter, currentPlayerFighterCurrentHp, currentPlayerFighterMaxHp, currentPlayerPoisonedIndicator, currentPlayerSlowedIndicator);
+            this.setUpFighterHtmlElements(true, this._currentPlayerFighter, currentPlayerFighterCurrentHp, currentPlayerFighterMaxHp, currentPlayerPoisonedIndicator, currentPlayerSlowedIndicator, currentPlayerFighterName);
+
+            this._currentPlayerFighter.updateAllDisplayElements();
         }
 
         setNewCurrentOpponentFighter(newFighter) {
-            this.clearFighterHtmlElements(this._currentOpponentFighter);
+            if (this._currentOpponentFighter) {
+                this.clearFighterHtmlElements(this._currentOpponentFighter);
+            }
 
             this._currentOpponentFighter = newFighter;
 
-            this.setUpFighterHtmlElements(this._currentOpponentFighter, currentOpponentFighterCurrentHp, currentOpponentFighterMaxHp, currentOpponentPoisonedIndicator, currentOpponentSlowedIndicator);
+            this.setUpFighterHtmlElements(false, this._currentOpponentFighter, currentOpponentFighterCurrentHp, currentOpponentFighterMaxHp, currentOpponentPoisonedIndicator, currentOpponentSlowedIndicator, currentOpponentFighterName);
+
+            this._currentOpponentFighter.updateAllDisplayElements();
         }
 
         clearFighterHtmlElements(fighter) {
+            fighter._nameElement = null;
             fighter._maxHpElement = null;
             fighter._currentHpElement = null;
             fighter._poisonedIndicator.hide();
             fighter._slowedIndicator.hide();
             fighter._poisonedIndicator = null;
             fighter._slowedIndicator = null;
+            playerMoveButton1.hide();
+            playerMoveButton2.hide();
+            playerMoveButton3.hide();
+            this.disableButtons();
         }
 
-        setUpFighterHtmlElements(fighter, currentHpElement, maxHpElement, poisonedIndicator, slowedIndicator) {
+        setUpFighterHtmlElements(isPlayer, fighter, currentHpElement, maxHpElement, poisonedIndicator, slowedIndicator, nameElement) {
+            fighter._nameElement = nameElement;
             fighter._currentHpElement = currentHpElement;
             fighter._maxHpElement = maxHpElement;
             fighter._poisonedIndicator = poisonedIndicator;
             fighter._slowedIndicator = slowedIndicator;
-            if (fighter._isPoisoned) {
-                fighter._poisonedIndicator.showInlineBlock();
+            if (isPlayer) {
+                this.enableButtons(fighter);
             }
-            if (fighter._isSlowed) {
-                fighter._slowedIndicator.showInlineBlock();
-            }
+        }
+
+        sendOutFirstPlayerFighter() {
+            this.setNewCurrentPlayerFighter(this._currentPlayerTeam[0]);
+        }
+
+        sendOutFirstOpponentFighter() {
+            this.setNewCurrentOpponentFighter(this._currentOpponentTeam[0]);
         }
     }
 
@@ -238,6 +306,7 @@
             this._currentHpElement = null;
             this._poisonedIndicator = null;
             this._slowedIndicator = null;
+            this._nameElement = null;
         }
 
         useMove(moveIndex, target) {
@@ -250,58 +319,64 @@
                     if (move._accuracy < 100) {
                         let accuracyRoll = getRandomIntInclusive(1, 100);
                         if (accuracyRoll > move._accuracy) {
-                            console.log("The move missed!");
                             // TODO: conclude the move usage
+                            fightText.appendText("The move missed!");
                             return;
                         }
+                    }
+
+                    this.applyMoveEffects(move, target);
+                }
+                else {
+                    this.applyMoveEffects(move, target);
+                }
+            }
+
+            // TODO: Remove these after I get proper UI updating in place
+            this.updateAllDisplayElements();
+            target.updateAllDisplayElements();
+            
+        }
+
+        applyMoveEffects(move, target) {
+            if (move._causesDamageDirectly) {
+                let damage = calculateDamageToSingleTarget(this, target, move);
+                target._currentHp -= damage;
+                if (target._currentHp < 0) {
+                    target._currentHp = 0;
+                }
+                if (target._currentHp == 0) {
+                    fightText.appendText(target._name + " was defeated!");
+                }
+            }
+            if (move._inflictsStatus) {
+                if (move._statusToInflict) {
+                    if (target.hasStatusCondition()) {
+                        fightText.appendText("The target already has a status condition!");
+                    }
+                    else {
+                        if (move._statusToInflict == "poison") {
+                            target._isPoisoned = true;
+                            target._poisonedIndicator.showInlineBlock();
+                        }
+                        else if (move._statusToInflict == "slowed") {
+                            target._isSlowed = true;
+                            target._slowedIndicator.showInlineBlock();
+                        }
                         else {
-                            if (move._causesDamageDirectly) {
-                                let damage = calculateDamageToSingleTarget(this, target, move);
-                                target._currentHp -= damage;
-                                if (target._currentHp < 0) {
-                                    target._currentHp = 0;
-                                }
-                                if (target._currentHp == 0) {
-                                    // TODO: Handle target being defeated
-                                }
-                            }
-                            if (move._inflictsStatus) {
-                                if (move._statusToInflict) {
-                                    if (target.hasStatusCondition()) {
-                                        // TODO: Show a message saying the target already has a status condition
-                                    }
-                                    else {
-                                        if (move._statusToInflict == "poison") {
-                                            target._isPoisoned = true;
-                                            target._poisonedIndicator.showInlineBlock();
-                                        }
-                                        else if (move._statusToInflict == "slowed") {
-                                            target._isSlowed = true;
-                                            target._slowedIndicator.showInlineBlock();
-                                        }
-                                        else {
-                                            console.log("The status to inflict was not 'poison' or 'slowed'. No status was applied to the target fighter.");
-                                        }
-                                    }
-                                }
-                                else {
-                                    console.log("Error: the move tried to inflict status, but statusToInflict was null or undefined.");
-                                }
-                            }
-                            if (move._changesStatsOfSelf) {
-                                this.changeStats(move._statChanges);
-                            }
-                            if (move._changesStatsOfTarget) {
-                                target.changeStats(move._statChanges);
-                            }
+                            console.log("The status to inflict was not 'poison' or 'slowed'. No status was applied to the target fighter.");
                         }
                     }
                 }
                 else {
-                    if (move._causesDamageDirectly) {
-                        // TODO: damage calcs
-                    }
+                    console.log("Error: the move tried to inflict status, but statusToInflict was null or undefined.");
                 }
+            }
+            if (move._changesStatsOfSelf) {
+                this.changeStats(move._statChanges);
+            }
+            if (move._changesStatsOfTarget) {
+                target.changeStats(move._statChanges);
             }
         }
 
@@ -311,15 +386,18 @@
                 // TODO: Calculate HP change
                 if (this._currentHp == this._maxHp && statChanges._hp > 0) {
                     // TODO: Say that hp was already at maximum
+                    fightText.appendText("The HP for " + this._name + " was already at maximum");
                 }
                 else {
                     let oldHpValue = this._currentHp.valueOf();
                     this._currentHp += statChanges._hp;
                     if (this._currentHp <= this._maxHp && statChanges._hp > 0) {
-                        // TODO: Say that we healed HP equal to move_statChanges._hp
+                        // TODO: Say that we healed HP equal to move._statChanges._hp
+                        fightText.appendText("The HP for " + this._name + " increased by " + move._statChanges._hp);
                     }
                     else if (this._currentHp <= 0) {
                         // TODO: Show that this fighter has been defeated
+                        fightText.appendText(this._name + " was defeated!");
                     }
                     else {
                         let hpChange = this._currentHp - oldHpValue;
@@ -346,28 +424,28 @@
         changeStat(statChange, deltaStat, statName) {
             if (statChange > 0) {
                 if (deltaStat >= maxStatDelta) {
-                    // TODO: Show that this stat cannot go higher
+                    fightText.appendText("The " + statName + " stat for " + this._name + " cannot go higher!");
                 }
                 else if (Math.abs(deltaStat) >= maxStatDelta) {
-                    // TODO: Show that this stat cannot go lower
+                    fightText.appendText("The " + statName + " stat for " + this._name + " cannot go lower!");
                 }
                 else {
                     let oldStatValue = deltaStat;
                     deltaStat += statChange;
                     if (deltaStat > maxStatDelta) {
                         let statChange = maxStatDelta - oldStatValue;
-                        // TODO: Show that this stat was increased by statChange
+                        fightText.appendText("The " + statName + " stat for " + this._name + " increased by " + statChange);
                     }
                     else if (Math.abs(deltaStat) > maxStatDelta) {
                         let statChange = maxStatDelta - Math.abs(deltaStat);
-                        // TODO: Show that this stat was decreased by statChange
+                        fightText.appendText("The " + statName + " stat for " + this._name + " decreased by " + Math.abs(statChange));
                     }
                     else {
                         if (statChange > 0) {
-                            // TODO: Show that this stat was increased by statChange
+                            fightText.appendText("The " + statName + " stat for " + this._name + " increased by " + statChange);
                         }
                         else {
-                            // TODO: Show that this stat was decreased by Math.abs(statChange)
+                            fightText.appendText("The " + statName + " stat for " + this._name + " decreased by " + Math.abs(statChange));
                         }
                     }
                 }
@@ -382,6 +460,41 @@
             else {
                 return false;
             }
+        }
+
+        updateAllDisplayElements() {
+            this.updateNameDisplay();
+            this.updateHpDisplay();
+            this.updateStatusElements();
+        }
+
+        updateNameDisplay() {
+            this._nameElement.setInnerHtml(this._name);
+        }
+
+        updateHpDisplay() {
+            this._maxHpElement.setInnerHtml(this._maxHp);
+            this._currentHpElement.setInnerHtml(this._currentHp);
+        }
+
+        updateStatusElements() {
+            if (this._isPoisoned) {
+                this._poisonedIndicator.showInlineBlock();
+            }
+            else {
+                this._poisonedIndicator.hide();
+            }
+            if (this._isSlowed) {
+                this._slowedIndicator.showInlineBlock();
+            }
+            else {
+                this._slowedIndicator.hide();
+            }
+        }
+
+        cpuAutoSelectMove() {
+            let randomIndex = getRandomIntInclusive(0, (this._moves.length - 1));
+            this.useMove(randomIndex, gameState._currentPlayerFighter);
         }
     }
 
@@ -467,6 +580,58 @@
         setClassName(inputClassName) {
             this._element.className = inputClassName;
         }
+
+        appendText(text) {
+            this._element.append(document.createTextNode(text));
+            this._element.appendChild(document.createElement("br"));
+        }
+    }
+
+    class HtmlInput {
+        constructor(inputId, val) {
+            this._inputId = inputId;
+            this._element = document.getElementById(inputId);
+            // Make val optional param
+            if (val !== undefined) {
+                this._element.value = val;
+            }
+        }
+
+        hide() {
+            this._element.style.display = "none";
+        }
+
+        showBlock() {
+            this._element.style.display = "block";
+        }
+
+        showInlineBlock() {
+            this._element.style.display = "inline-block";
+        }
+
+        getValue() {
+            return this._element.value;
+        }
+
+        setValue(val) {
+            this._element.value = val;
+        }
+
+        setColorRed() {
+            this._element.style.color = "red";
+        }
+
+        setColorBlack() {
+            this._element.style.color = "black";
+        }
+
+        disable() {
+            this._element.disabled = true;
+        }
+
+        enable() {
+            this._element.disabled = false;
+        }
     }
 
     function getRandomIntInclusive(min, max) {
@@ -479,10 +644,10 @@
         let attackOverDefense = null;
 
         if (move._damageCategory == "a") {
-            attackOverDefense = (attacker._attack * attacker._deltaAttack) / (defender._defense * defender._deltaDefense);
+            attackOverDefense = (attacker._attack * getDeltaMultiplier(attacker._deltaAttack)) / (defender._defense * getDeltaMultiplier(defender._deltaDefense));
         }
         else if (move._damageCategory == "m") {
-            attackOverDefense = (attacker._magicAttack * attacker._deltaMagicAttack) / (defender._magicDefense * defender._deltaMagicDefense);
+            attackOverDefense = (attacker._magicAttack * getDeltaMultiplier(attacker._deltaMagicAttack)) / (defender._magicDefense * getDeltaMultiplier(defender._deltaMagicDefense));
         }
         else {
             console.log("The move's damage category was invalid");
@@ -505,15 +670,51 @@
         }
     }
 
+    function getDeltaMultiplier(deltaValue) {
+        switch (deltaValue) {
+            case 0:
+                return 1;
+            case 1:
+                return 1.5;
+            case 2:
+                return 2;
+            case 3:
+                return 2.5;
+            case 4:
+                return 3;
+            case 5:
+                return 3.5;
+            case 6:
+                return 4;
+            case -1:
+                return 0.66;
+            case -2:
+                return 0.5;
+            case -3:
+                return 0.4;
+            case -4:
+                return 0.33;
+            case -5:
+                return 0.28;
+            case -6:
+                return 0.25;
+            default:
+                console.log("The delta value was not in the range of -6 to 6");
+                return 1;
+        }
+    }
+
     function getTypeResistanceMultiplier(attackingMoveType, defenderType) {
         if (attackingMoveType == defenderType) {
             return 1;
         }
         if (attackingMoveType == "rock") {
             if (defenderType == "paper") {
+                fightText.appendText(notVeryEffectiveText);
                 return 0.5;
             }
             else if (defenderType == "scissors") {
+                fightText.appendText(superEffectiveText);
                 return 2;
             }
             else {
@@ -522,9 +723,11 @@
         }
         else if (attackingMoveType == "paper") {
             if (defenderType == "scissors") {
+                fightText.appendText(notVeryEffectiveText);
                 return 0.5;
             }
             else if (defenderType == "rock") {
+                fightText.appendText(superEffectiveText);
                 return 2;
             }
             else {
@@ -533,9 +736,11 @@
         }
         else if (attackingMoveType == "scissors") {
             if (defenderType == "rock") {
+                fightText.appendText(notVeryEffectiveText);
                 return 0.5;
             }
             else if (defenderType == "paper") {
+                fightText.appendText(superEffectiveText);
                 return 2;
             }
             else {
@@ -547,48 +752,53 @@
         }
     }
 
-    function statCannotIncreaseFurther(statChange, currentStatValue, maxStat) {
-        if (statChange <= 0) {
-            return false;
-        }
-        else {
-            if (Math.abs(statChange + currentStatValue) > maxStat) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-
-    function statCannotDecreaseFurther(statChange, currentStatValue, maxStat) {
-        if (statChange >= 0) {
-            return false;
-        }
-        else {
-            if (Math.abs(currentStatValue - statChange) > maxStat) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-    }
-
     function startGame() {
+        mainMenuElement = new HtmlDiv("MainMenu");
+        fightLayoutElement = new HtmlDiv("FightLayout");
+        currentPlayerFighterName = new HtmlDiv("PlayerFighterName");
+        currentPlayerFighterCurrentHp = new HtmlDiv("PlayerCurrentHP");
+        currentPlayerFighterMaxHp = new HtmlDiv("PlayerMaximumHP");
+        currentPlayerPoisonedIndicator = new HtmlDiv("PlayerPoisonedIndicator");
+        currentPlayerSlowedIndicator = new HtmlDiv("PlayerSlowedIndicator");
+        currentOpponentFighterName = new HtmlDiv("EnemyFighterName");
+        currentOpponentFighterCurrentHp = new HtmlDiv("EnemyCurrentHP");
+        currentOpponentFighterMaxHp = new HtmlDiv("EnemyMaximumHP");
+        currentOpponentPoisonedIndicator = new HtmlDiv("EnemyPoisonedIndicator");
+        currentOpponentSlowedIndicator = new HtmlDiv("EnemySlowedIndicator");
+        playerMoveButton1 = new HtmlInput("MoveButton1");
+        playerMoveButton2 = new HtmlInput("MoveButton2");
+        playerMoveButton3 = new HtmlInput("MoveButton3");
+        fightText = new HtmlDiv("FightText");
         gameState = new GameState();
         let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false, null);
         let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false, null);
-        let fighter_kyle = new Fighter("Kyle Blastar", "rock", 100, 120, 80, 100, 120, 80, [move_heavyPunch]);
+        let fighter_kyle = new Fighter("Kyle Blastar", "rock", 500, 120, 80, 100, 120, 80, [move_heavyPunch]);
         console.log(fighter_kyle);
-        let fighter_matt = new Fighter("Matt", "scissors", 100, 100, 100, 100, 100, 100, [move_poisonBlade]);
+        let fighter_matt = new Fighter("Matt", "scissors", 500, 100, 100, 100, 100, 100, [move_poisonBlade]);
         console.log(fighter_matt);
         gameState._currentPlayerTeam = [fighter_kyle];
         gameState._currentOpponentTeam = [fighter_matt];
-        gameState._currentPlayerFighter = fighter_kyle;
-        gameState._currentOpponentFighter = fighter_matt;
+        gameState.sendOutFirstOpponentFighter();
+        gameState.sendOutFirstPlayerFighter();
         console.log(gameState);
+        mainMenuElement.hide();
+        fightLayoutElement.showBlock();
+
+        // TODO: Replace this with real fight logic somewhere else
+        // Begin fighting!
+        gameState.setTurnBasedOnSpeed();
+        if (gameState._playerTurn == false) {
+            gameState._currentOpponentFighter.cpuAutoSelectMove();
+            gameState._playerTurn = true;
+        }
+
     }
+
+
+    document.getElementById("MoveButton1").addEventListener('click', function () { gameState._currentPlayerFighter.useMove(0, gameState._currentOpponentFighter) });
+    document.getElementById("MoveButton2").addEventListener('click', function () { gameState._currentPlayerFighter.useMove(1, gameState._currentOpponentFighter) });
+    document.getElementById("MoveButton3").addEventListener('click', function () { gameState._currentPlayerFighter.useMove(2, gameState._currentOpponentFighter) });
+
 
 
     // Main game:
