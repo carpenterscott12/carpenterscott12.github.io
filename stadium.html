@@ -87,9 +87,9 @@
             </div>
             <div>
                 <div>HP</div>
-                <div id="EnemyCurrentHP"></div>
-                <div>/</div>
-                <div id="EnemyMaximumHP"></div>
+                <div id="EnemyCurrentHP" class="hp-display"></div>
+                <div class="hp-display">/</div>
+                <div id="EnemyMaximumHP" class="hp-display"></div>
                 <div id="EnemyPoisonedIndicator">*Poisoned*</div>
                 <div id="EnemySlowedIndicator">*Slowed*</div>
             </div>
@@ -101,9 +101,9 @@
             </div>
             <div>
                 <div>HP</div>
-                <div id="PlayerCurrentHP"></div>
-                <div>/</div>
-                <div id="PlayerMaximumHP"></div>
+                <div id="PlayerCurrentHP" class="hp-display"></div>
+                <div class="hp-display">/</div>
+                <div id="PlayerMaximumHP" class="hp-display"></div>
                 <div id="PlayerPoisonedIndicator">*Poisoned*</div>
                 <div id="PlayerSlowedIndicator">*Slowed*</div>
             </div>
@@ -373,6 +373,7 @@
                         if (accuracyRoll > move._accuracy) {
                             // TODO: conclude the move usage
                             fightText.appendText("The move missed!");
+                            this.handleTurnEnding(target, anyFighterDefeatedThisRound);
                             return anyFighterDefeatedThisRound;
                         }
                     }
@@ -384,6 +385,11 @@
                 }
             }
 
+            this.handleTurnEnding(target, anyFighterDefeatedThisRound);
+            return anyFighterDefeatedThisRound;
+        }
+
+        handleTurnEnding(target, anyFighterDefeatedThisRound) {
             if (anyFighterDefeatedThisRound) {
                 gameState.resetTurn();
                 gameState.setTurnBasedOnSpeed();
@@ -400,7 +406,6 @@
                     gameState.incrementTurn();
                 }
             }
-            return anyFighterDefeatedThisRound;
         }
 
         applyMoveEffects(move, target) {
@@ -585,7 +590,7 @@
 
     class FighterMove {
         constructor(name, type, damageCategory, power, accuracy, affectedByAccuracy, causesDamageDirectly, inflictsStatus,
-            chanceToInflictStatus, statusToInflict, changesStatsOfSelf, halvesDamageToSelfOnNextHit, changesStatsOfTarget, statChanges, playerFighter) {
+            chanceToInflictStatus, statusToInflict, changesStatsOfSelf, halvesDamageToSelfOnNextHit, changesStatsOfTarget, statChanges) {
             this._name = name;
             this._type = type;
             this._damageCategory = damageCategory;
@@ -600,7 +605,6 @@
             this._halvesDamageToSelfOnNextHit = halvesDamageToSelfOnNextHit;
             this._changesStatsOfTarget = changesStatsOfTarget;
             this._statChanges = statChanges;
-            this._playerFighter = playerFighter;
         }
     }
 
@@ -670,6 +674,8 @@
         appendText(text) {
             this._element.append(document.createTextNode(text));
             this._element.appendChild(document.createElement("br"));
+            // This is to keep the scrollable area at the bottom to show new messages
+            this._element.scrollTop = this._element.scrollHeight;
         }
     }
 
@@ -881,15 +887,16 @@
         playerMoveButton3 = new HtmlInput("MoveButton3");
         fightText = new HtmlDiv("FightText");
         gameState = new GameState();
-        let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false, null);
-        let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false, null);
-        let fighter_kyle = new Fighter("Kyle Blastar", "rock", 500, 120, 80, 100, 120, 80, [move_heavyPunch], true);
-        let fighter_kebeton_general = new Fighter("Kebeton General", "scissors", 500, 100, 120, 100, 100, 80, [move_heavyPunch], true);
-        let fighter_tensom_general = new Fighter("Tensom General", "paper", 500, 80, 120, 100, 80, 120, [move_heavyPunch], true);
+        let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false);
+        let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false);
+        let move_paperCannon = new FighterMove("Paper Cannon", "paper", "m", 100, 70, true, true, false, true, "slow", false, false, false, false);
+        let fighter_kyle = new Fighter("Kyle Blastar", "rock", 500, 120, 80, 100, 120, 80, [move_heavyPunch, move_poisonBlade], true);
+        let fighter_kebeton_general = new Fighter("Kebeton General", "scissors", 500, 100, 120, 100, 100, 80, [move_poisonBlade], true);
+        let fighter_tensom_general = new Fighter("Tensom General", "paper", 500, 80, 120, 100, 80, 120, [move_paperCannon], true);
         console.log(fighter_kyle);
         let fighter_matt = new Fighter("Matt", "scissors", 500, 100, 100, 100, 100, 100, [move_poisonBlade], false);
-        let fighter_tom = new Fighter("Tom", "paper", 500, 60, 80, 120, 120, 120, [move_poisonBlade], false);
-        let fighter_ryan = new Fighter("Ryan", "rock", 500, 130, 120, 50, 120, 80, [move_poisonBlade], false);
+        let fighter_tom = new Fighter("Tom", "paper", 500, 60, 80, 120, 120, 120, [move_paperCannon], false);
+        let fighter_ryan = new Fighter("Ryan", "rock", 500, 130, 120, 50, 120, 80, [move_heavyPunch], false);
         console.log(fighter_matt);
         gameState._currentPlayerTeam = [fighter_kyle, fighter_kebeton_general, fighter_tensom_general];
         gameState._currentOpponentTeam = [fighter_matt, fighter_tom, fighter_ryan];

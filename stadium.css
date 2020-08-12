@@ -1,1 +1,17 @@
+body {
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 20px;
+}
 
+
+.hp-display {
+    display: inline-block;
+}
+
+#FightText {
+    height: 100px;
+    overflow-y: auto;
+    border-radius: 1px;
+    border: solid;
+    border-color: #212121;
+}
