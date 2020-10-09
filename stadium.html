@@ -177,6 +177,8 @@
     let playerMoveButton2 = null;
     let playerMoveButton3 = null;
     let fightText = null;
+    let primaryFightLayout = null;
+    let swapFightersLayout = null;
     let gameState = null;
 
     class GameState {
@@ -329,7 +331,7 @@
     }
 
     class Fighter {
-        constructor(name, type, maxHp, attack, defense, magicAttack, magicDefense, speed, moves) {
+        constructor(name, type, maxHp, attack, defense, magicAttack, magicDefense, speed, moves, isPlayerFighter) {
             this._name = name;
             this._type = type;
             this._maxHp = maxHp;
@@ -352,6 +354,7 @@
             this._poisonedIndicator = null;
             this._slowedIndicator = null;
             this._nameElement = null;
+            this._isPlayerFighter = isPlayerFighter;
         }
 
         useMove(moveIndex, target) {
@@ -845,8 +848,11 @@
     }
 
     function handleFighterDefeat(fighter) {
-        if (fighter._playerFighter) {
+        if (fighter._isPlayerFighter) {
             // TODO: Show the fighter selection screen and disable the dead fighter
+            console.log("Player fighter was defeated");
+            primaryFightLayout.hide();
+            swapFightersLayout.showBlock();
         }
         else {
             // TODO: Select next fighter for opponent
@@ -886,6 +892,8 @@
         playerMoveButton2 = new HtmlInput("MoveButton2");
         playerMoveButton3 = new HtmlInput("MoveButton3");
         fightText = new HtmlDiv("FightText");
+        primaryFightLayout = new HtmlDiv("PrimaryFightLayout");
+        swapFightersLayout = new HtmlDiv("SwapFightersLayout");
         gameState = new GameState();
         let move_heavyPunch = new FighterMove("Heavy Punch", "rock", "a", 90, 100, true, true, false, false, null, false, false, false);
         let move_poisonBlade = new FighterMove("Poison Blade", "scissors", "a", 70, 100, true, true, false, true, "poison", false, false, false);
