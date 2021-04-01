@@ -851,8 +851,26 @@
         if (fighter._isPlayerFighter) {
             // TODO: Show the fighter selection screen and disable the dead fighter
             console.log("Player fighter was defeated");
-            primaryFightLayout.hide();
-            swapFightersLayout.showBlock();
+            let playerHasFightersLeft = false;
+            let i = 0;
+            for (i = 0; i < gameState._currentPlayerTeam.length; i++) {
+                if (gameState._currentPlayerTeam[i]._currentHp > 0) {
+                    playerHasFightersLeft = true;
+                }
+                else {
+                    // TODO: Disable the fighter at index 'i' when showing the swapFightersLayout
+                }
+            }
+            if (playerHasFightersLeft == true) {
+                gameState.disableButtons();
+                primaryFightLayout.hide();
+                swapFightersLayout.showBlock();
+                // TODO: Disable all fighters who have 0 HP left
+            }
+            else {
+                fightText.appendText("Player has no more fighters left. You lose the fight!");
+                // TODO: Handle what happens when a fight is over
+            }
         }
         else {
             // TODO: Select next fighter for opponent
@@ -923,6 +941,8 @@
     document.getElementById("MoveButton1").addEventListener('click', function () { gameState.runTurns(0) });
     document.getElementById("MoveButton2").addEventListener('click', function () { gameState.runTurns(1) });
     document.getElementById("MoveButton3").addEventListener('click', function () { gameState.runTurns(2) });
+
+    document.getElementById("SelectFighter1Swap").addEventListener('click', function () { gameState.runTurns(2) });
 
 
 
